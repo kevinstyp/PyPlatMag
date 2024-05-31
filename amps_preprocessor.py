@@ -9,130 +9,81 @@ from pyquaternion import Quaternion
 from scipy import interpolate
 
 import utils.time_handler as th
-# import mToolsQuaternion_py3 as mtq
 from dipole import Dipole
+import utils.load_omni_data as omni_loader
+from os.path import isfile
+
+import datetime
 
 logger = logging.getLogger(__name__)
 
-def unpack_amps_params_file_to_df(amps_params_path, year_month_specifier):
-    amps_params_numpy = np.genfromtxt(amps_params_path,
-                                   dtype=('U4', 'U3', 'U2', 'U2', np.float32, np.float32, np.float32),
+def unpack_amps_params_file_to_df(auxiliary_data_path, year_month, use_cache=True):
+    amps_params_path = omni_loader.get_output_filename(year=year_month[:4], data_spec="minute")
+    # If cache shall not be used or file does not exist, create it
+    if not use_cache or not isfile(amps_params_path):
+        # Load the data from omni
+        omni_loader.fetch_omni_data(year=year_month[:4], outdir=auxiliary_data_path, data_spec="minute")
+    else:
+        logger.info(f"Loading data from cache: {amps_params_path}")
+
+    amps_params_array = np.genfromtxt(amps_params_path,
+                                   dtype=('U4', 'U3', 'U2', 'U2', np.float64, np.float64, np.float64),
                                    names=['year', 'dayofyear', 'hour', 'minute', "By", "Bz", "Sw"])
-    print("amps_params_numpy: ", amps_params_numpy)
-    print("amps_params_numpy.shape: ", amps_params_numpy.shape)
-
-    mask = (amps_params_numpy['year'] == year_month_specifier[:4])
-    amps_params_numpy = amps_params_numpy[mask]
-
-    print("amps_params_numpy: ", amps_params_numpy)
-    print("amps_params_numpy.shape: ", amps_params_numpy.shape)
+    logger.debug(f"amps_params_array: {amps_params_array}")
+    logger.debug(f"amps_params_array.shape: {amps_params_array.shape}")
 
     amps_params_df = pd.DataFrame(columns=["Amps_Timestamp", "gps_sec", "By", "Bz", "Sw"])
-    # timestamps = [datetime.datetime.strptime(kp_dst[0] + ' ' + kp_dst[1] + ' ' + kp_dst[2] + ' ' + kp_dst[3], '%Y %j %H %M') for kp_dst in
-    #               amps_params_numpy
-    #               # if int(kp_dst[0]) > int(year_month_specifiers[0][:4]) and int(kp_dst[0]) < int(year_month_specifiers[-1][:4])
-    #               ]
-    # timestamps = [datetime.datetime.strptime("{year} {dayofyear} {hour} {minute}".format(**kp_dst), '%Y %j %H %M') for kp_dst in
-    #               amps_params_numpy]
-    datetimes_df = pd.DataFrame(
-        {"year": amps_params_numpy['year'], "dayofyear":  amps_params_numpy['dayofyear'], "hour": amps_params_numpy['hour'],
-         "minute": amps_params_numpy['minute']}
-    )
-    print("datetimes_df: ", datetimes_df)
-    print("datetimes_df.head(5): ", datetimes_df.head(5))
-    print("datetimes_df.tail(5): ", datetimes_df.tail(5))
-    print("datetimes_df['year']: ", datetimes_df['year'])
-    datetimes_df['year'] = pd.to_numeric(datetimes_df['year'])
-    datetimes_df['dayofyear'] = pd.to_numeric(datetimes_df['dayofyear'])
-    datetimes_df['hour'] = pd.to_numeric(datetimes_df['hour'])
-    datetimes_df['minute'] = pd.to_numeric(datetimes_df['minute'])
-    print("datetimes_df['year']: ", datetimes_df['year'])
-
-    #print("pd.Timestamp(datetimes_df['year']): ", pd.to_datetime(datetimes_df['year'], format="%Y"))
-    # # datetimes_df_2 = pd.to_datetime(datetimes_df)
-    # datetimes_df_2 = pd.to_datetime(datetimes_df['dayofyear'], unit='D', origin=pd.to_datetime(datetimes_df['year'], format="%Y"))
-    ## Add them together by shifting them through multitplication, so that format in line below can be applied
-    datetimes_df['combined'] = datetimes_df['year'] * 10000000 + datetimes_df['dayofyear'] * 10000 + \
-                               datetimes_df['hour'] * 100 + datetimes_df['minute']
-    print("datetimes_df['combined']: ", datetimes_df['combined'])
-    timestamps = pd.to_datetime(datetimes_df['combined'], format='%Y%j%H%M')
-    print("timestamps: ", timestamps)
 
 
+    timestamps = [datetime.datetime.strptime(amps_param[0] + ' ' + amps_param[1] + ' ' + amps_param[2] + ' ' + amps_param[3], '%Y %j %H %M') for
+                  amps_param in amps_params_array]
+    print("timestamps 2: ", timestamps[:10])
 
-
-    # timestamps = np.datetime64(amps_params_numpy['year'] + '-' + amps_params_numpy['dayofyear'] + 'T' + amps_params_numpy['hour'] + ':' +
-    #     amps_params_numpy['minute'], 'm')
-    #gps_times = [float(to_gps(timestamp)) for timestamp in timestamps]
-    #print("first gps_times: ", gps_times[:10])
-
-    #gps_times = list(map(to_gps, timestamps))
-    gps_times = th.datetime_to_gps(timestamps).astype(np.float64)
+    gps_times = th.datetime_to_gps(timestamps)
     print("second gps_times: ", gps_times[:10])
-    datetimes_df['gps_sec'] = gps_times
-    pd.set_option("display.precision", 15)
-    print("datetimes_df.head(10): ", datetimes_df.head(10))
-
     print("timestamps.shape: ", len(timestamps))
     print("gps_times.shape: ", len(gps_times))
-    print("amps_params_numpy['By'].shape: ", amps_params_numpy['By'].shape)
 
-    amps_params_df = amps_params_df.append(pd.DataFrame({"Amps_Timestamp": timestamps,
-                                       "gps_sec": gps_times,
-                                       "By": amps_params_numpy['By'], "Bz": amps_params_numpy['Bz'],
-                                       "Sw": amps_params_numpy['Sw'],
+    amps_params_df = amps_params_df.append(pd.DataFrame({"Amps_Timestamp": timestamps, "gps_sec": gps_times,
+                                       "By": amps_params_array['By'], "Bz": amps_params_array['Bz'], "Sw": amps_params_array['Sw'],
                                        }))
-
 
     return amps_params_df
 
 def enrich_df_with_amps_params_data(data, amps_params_df):
-    # Set flag where values are 999.9 or 9999. depending on the type of column because apparently that means the value is missing
+    # Set flag where values are 999.9 or 9999. depending on the type of column because that means the value is missing
     amps_params_df['Spaceweather_Flag'] = 0.
-    amps_params_df.loc[amps_params_df['By'] >= 999., 'Spaceweather_Flag'] = 1.  # ok
-    amps_params_df.loc[amps_params_df['Bz'] >= 999., 'Spaceweather_Flag'] = 1.  # ok
-    amps_params_df.loc[amps_params_df['Sw'] >= 9999., 'Spaceweather_Flag'] = 1.  # ok
-    #amps_params_df.loc[amps_params_df['KP'] >= 999., 'Spaceweather_Flag'] = 1.  # ok
-    #amps_params_df.loc[amps_params_df['Dst'] >= 999., 'Spaceweather_Flag'] = 1.  # ok
-    #amps_params_df.loc[amps_params_df['F10.7'] >= 999., 'Spaceweather_Flag'] = 1.  # ok
+    amps_params_df.loc[amps_params_df['By'] >= 999., 'Spaceweather_Flag'] = 1.
+    amps_params_df.loc[amps_params_df['Bz'] >= 999., 'Spaceweather_Flag'] = 1.
+    amps_params_df.loc[amps_params_df['Sw'] >= 9999., 'Spaceweather_Flag'] = 1.
 
-
-
-
-
-
+    # Interpolate the values to the data
     by_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["By"], kind='linear', fill_value="extrapolate")
     data["By"] = by_interpolater(data["gps_sec"])
     bz_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Bz"], kind='linear', fill_value="extrapolate")
     data["Bz"] = bz_interpolater(data["gps_sec"])
     sw_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Sw"], kind='linear', fill_value="extrapolate")
     data["Sw"] = sw_interpolater(data["gps_sec"])
-    # dst_interpolater = interpolate.interp1d(kp_df["gps_sec"], kp_df["Dst"], kind='linear', fill_value="extrapolate")
-    # data["Dst"] = dst_interpolater(data["gps_sec"])
-    # f107_interpolater = interpolate.interp1d(kp_df["gps_sec"], kp_df["F10.7"], kind='linear', fill_value="extrapolate")
-    # data["F10.7"] = f107_interpolater(data["gps_sec"])
 
     # now set to null in reference dataframe for rolling window to ignore these values
     amps_params_df['By'] = np.where(amps_params_df.By >= 999., np.nan, amps_params_df.By)
     amps_params_df['Bz'] = np.where(amps_params_df.Bz >= 999., np.nan, amps_params_df.Bz)
     amps_params_df['Sw'] = np.where(amps_params_df.Sw >= 9999., np.nan, amps_params_df.Sw)
-    # count nans in By:
-    print("amps_params_df['By'].isnull().sum(): ", amps_params_df['By'].isnull().sum())
-    print("amps_params_df['Bz'].isnull().sum(): ", amps_params_df['Bz'].isnull().sum())
-    print("amps_params_df['Sw'].isnull().sum(): ", amps_params_df['Sw'].isnull().sum())
-    # Fill Nans in amps_params_df['By'] with linear interpolation
-    amps_params_df['By'] = amps_params_df['By'].interpolate(method='linear') #,limit_direction='both')
-    amps_params_df['Bz'] = amps_params_df['Bz'].interpolate(method='linear') #,limit_direction='both')
-    amps_params_df['Sw'] = amps_params_df['Sw'].interpolate(method='linear') #,limit_direction='both')
-    print("amps_params_df['By'].isnull().sum(): ", amps_params_df['By'].isnull().sum())
-    print("amps_params_df['Bz'].isnull().sum(): ", amps_params_df['Bz'].isnull().sum())
-    print("amps_params_df['Sw'].isnull().sum(): ", amps_params_df['Sw'].isnull().sum())
-
-
-    print("amps_params_df.head(5): ", amps_params_df.head(5))
+    # count nans in parameters -> missing values
+    logger.info(f"Missing By in amps_params_df: {amps_params_df['By'].isnull().sum()}")
+    logger.info(f"Missing Bz in amps_params_df: {amps_params_df['Bz'].isnull().sum()}")
+    logger.info(f"Missing Sw in amps_params_df: {amps_params_df['Sw'].isnull().sum()}")
+    # Fill Nans / missing values with linear interpolation
+    amps_params_df['By'] = amps_params_df['By'].interpolate(method='linear')
+    amps_params_df['Bz'] = amps_params_df['Bz'].interpolate(method='linear')
+    amps_params_df['Sw'] = amps_params_df['Sw'].interpolate(method='linear')
+    logger.debug(f"Missing By after interpolation in amps_params_df: {amps_params_df['By'].isnull().sum()}")
+    logger.debug(f"Missing Bz after interpolation in amps_params_df: {amps_params_df['Bz'].isnull().sum()}")
+    logger.debug(f"Missing Sw after interpolation in amps_params_df: {amps_params_df['Sw'].isnull().sum()}")
+    logger.debug(f"amps_params_df.head(5): {amps_params_df.head(5)}")
 
     amps_params_df = amps_params_df.set_index("Amps_Timestamp", drop=False)
-
+    # Add additional 20min rolling mean columns to the dataframe for the parameters
     amps_params_df["By-20m"] = amps_params_df["By"].rolling('20min', min_periods=10).mean()
     amps_params_df["Bz-20m"] = amps_params_df["Bz"].rolling('20min', min_periods=10).mean()
     amps_params_df["Sw-20m"] = amps_params_df["Sw"].rolling('20min', min_periods=10).mean()
@@ -140,9 +91,9 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     amps_params_df.loc[amps_params_df['Bz-20m'].isnull(), 'Spaceweather_Flag'] = 1.
     amps_params_df.loc[amps_params_df['Sw-20m'].isnull(), 'Spaceweather_Flag'] = 1.
 
+    # TODO: Can this happen after values have been filled?
     print("before amps_params_df['By-20m'].isnull().sum(): ", amps_params_df['By-20m'].isnull().sum())
     print("before amps_params_df['Sw-20m'].isnull().sum(): ", amps_params_df['Sw-20m'].isnull().sum())
-
     by20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["By-20m"], kind='linear', fill_value="extrapolate")
     data["By-20m"] = by20m_interpolater(data["gps_sec"])
     bz20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Bz-20m"], kind='linear', fill_value="extrapolate")
@@ -150,44 +101,29 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     sw20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Sw-20m"], kind='linear', fill_value="extrapolate")
     data["Sw-20m"] = sw20m_interpolater(data["gps_sec"])
 
-
-
-
     print("after amps_params_df['By-20m'].isnull().sum(): ", amps_params_df['By-20m'].isnull().sum())
     print("after data['By-20m'].isnull().sum(): ", data['By-20m'].isnull().sum())
     print("after amps_params_df['Sw-20m'].isnull().sum(): ", amps_params_df['Sw-20m'].isnull().sum())
     print("after data['Sw-20m'].isnull().sum(): ", data['Sw-20m'].isnull().sum())
 
-    # data["By-20m"] = amps_params_df["By"].rolling('20min', min_periods=10).mean()
-    # data["Bz-20m"] = amps_params_df["Bz"].rolling('20min', min_periods=10).mean()
-    # data["Sw-20m"] = amps_params_df["Sw"].rolling('20min', min_periods=10).mean()
-
-    # flag_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Spaceweather_Flag"], kind='linear',
-    #                                          fill_value="extrapolate")
-    # data["Spaceweather_Flag"] = flag_interpolater(data["gps_sec"])
-    # # Set Flag everywhere back to 1. where it was interpolated, even only slightly away from 0.
-    # data.loc[data['Spaceweather_Flag'] > 0., 'Spaceweather_Flag'] = 1.
-
-    # Find Nan values in By-20m, Bz-20m, Sw-20m and set Spaceweather_Flag to 1. only there, the rest got meaningfully interpolated
+    # Find Nan values in By-20m, Bz-20m, Sw-20m and set Spaceweather_Flag to 1. The rest got meaningfully interpolated
     data.loc[data['By-20m'].isnull(), 'Spaceweather_Flag'] = 1.
     data.loc[data['Bz-20m'].isnull(), 'Spaceweather_Flag'] = 1.
     data.loc[data['Sw-20m'].isnull(), 'Spaceweather_Flag'] = 1.
 
-
     # Sanity check for Spaceweather flags set to 1
-    print("data['Spaceweather_Flag'].sum(): ", data['Spaceweather_Flag'].sum())
-    print("data.loc[data['Spaceweather_Flag'] == 1., 'By']: ", data.loc[data['Spaceweather_Flag'] == 1., 'By'])
-    print("data.loc[data['Spaceweather_Flag'] == 1., 'Bz']: ", data.loc[data['Spaceweather_Flag'] == 1., 'Bz'])
-    print("data.loc[data['Spaceweather_Flag'] == 1., 'Sw']: ", data.loc[data['Spaceweather_Flag'] == 1., 'Sw'])
-
+    logger.debug(f"data['Spaceweather_Flag'].sum(): {data['Spaceweather_Flag'].sum()}")
+    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 1., 'By']: {data.loc[data['Spaceweather_Flag'] == 1., 'By']}")
+    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 1., 'Bz']: {data.loc[data['Spaceweather_Flag'] == 1., 'Bz']}")
+    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 1., 'Sw']: {data.loc[data['Spaceweather_Flag'] == 1., 'Sw']}")
     # Print out max values of the BY, BZ, SW columns
-    print("data['By-20m'].max() raw: ", data['By-20m'].max())
-    print("data['Bz-20m'].max() raw: ", data['Bz-20m'].max())
-    print("data['Sw-20m'].max() raw: ", data['Sw-20m'].max())
+    logger.debug(f"data['By-20m'].max() raw: {data['By-20m'].max()}")
+    logger.debug(f"data['Bz-20m'].max() raw: {data['Bz-20m'].max()}")
+    logger.debug(f"data['Sw-20m'].max() raw: {data['Sw-20m'].max()}")
     # Print out max values with spaceweather flag set to 0
-    print("data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max(): ", data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max())
-    print("data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max(): ", data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max())
-    print("data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max(): ", data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max())
+    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max()}")
+    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max()}")
+    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max()}")
 
     return data
 
@@ -222,10 +158,13 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     # TODO: get_B_space() claims to use glat and glon as 'geographic' coordinates,
     #  but the function actually uses geodetic coordinates (according to KML).
     #  This is also supported by the height parameter being requested in geodetic coordinates.
+    import time
+    start_overall = time.process_time()
     B_e, B_n, B_u = pyamps.get_B_space(glat=gdlat, glon=data["RAW_Longitude"].values, height=height,
                                        time=data["RAW_Timestamp"].values,
                                        v=data["Sw-20m"].values, By=data["By-20m"].values, Bz=data["Bz-20m"].values,
                                        tilt=data["tilt"].values, f107=data["F10.7"].values)
+    logger.info("Time for get_B_Space in AMPS data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
     print("b_space: ", B_e, B_n, B_u)
     # Convert the geodetic return values of the get_B_space() function to geocentric coordinates
     # TODO: Sanity check with returned "new" geocentric coordinates
@@ -235,9 +174,7 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     B_c = -B_r
     # The theta return needs to be inverted as well
     B_n = -B_th
-    # B_n is the N component from NEC
-    # B_e is the E component from NEC
-    # B_c is the C component from NEC
+    # B_n, B_e, B_c are the N, E, C components from NEC
     amps_nec = np.column_stack([B_n, B_e, B_c])
     print("amps_nec: ", amps_nec)
     # Now we can compute the magnetic field vector in the spacecraft frame by inverting the FGM_to_NEC quaternions and applying them
@@ -256,11 +193,13 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     print("quat[:4]: ", quat[:4])
     #my_quaternions = Quaternion(w=quat[:, 3], x=quat[:, 0], y=quat[:, 1], z=quat[:, 2])
     #my_quaternions = [Quaternion(w, x, y, z) for x, y, z, w in quat]
+    time1 = time.process_time()
     my_quaternions_inversed = [Quaternion(w, x, y, z).inverse for x, y, z, w in quat]
     print("my_quaternions_inversed[:4]: ", my_quaternions_inversed[:4])
     amps_mag = np.array([q.rotate(vec) for q, vec in zip(my_quaternions_inversed, amps_nec)])
     print("amps_nec: ", amps_nec.dtype)
     print("amps_mag: ", amps_mag.dtype)
+    print("Time for Pyquaternion: ", time.process_time() - time1)
     #amps_mag = my_quaternions_inversed.rotate(amps_nec)
 
     # amps_mag = mtq.m_multiplyQuaternion(quat,
@@ -274,15 +213,19 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     print("amps_mag: ", amps_mag)
 
     # import rowan
-    # quats_inversed = [rowan.inverse(np.array([x, y, z, w])) for x, y, z, w in quat]
+    # time2 = time.process_time()
+    # # Important: Note the order change in the quaternion components
+    # quats_inversed = [rowan.normalize(rowan.inverse(np.array([w, x, y, z]))) for x, y, z, w in quat]
     # print("quats_inversed[:4]: ", quats_inversed[:4])
     # print("first : ", rowan.rotate(quats_inversed[0], amps_nec[0]))
+    # print("rotation_matrix: ", rowan.to_matrix(quats_inversed[0]))
+    # print("rotation_matrices: ", rowan.to_matrix(quats_inversed))
     # # print("q1.rotate(amps_nec): ", q1.rotate(amps_nec))
     # alternative_amps_mag = np.array([rowan.rotate(q, vec) for q, vec in zip(quats_inversed, amps_nec)])
     # print("alternative_amps_mag: ", alternative_amps_mag)
+    # print("Time for rowan: ", time.process_time() - time2)
 
 
-    # print("amps_mag_old: ", amps_mag_old)
     data["amps_b_mag_x"] = amps_mag[:, 0]
     data["amps_b_mag_y"] = amps_mag[:, 1]
     data["amps_b_mag_z"] = amps_mag[:, 2]

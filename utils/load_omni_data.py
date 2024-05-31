@@ -1,6 +1,15 @@
 import requests
 from datetime import datetime
 
+def get_output_filename(year, data_spec="hourly"):
+    if data_spec == "hourly":
+        outfile = f"omni2_kp_dst_f107_{year}.lst"
+    elif data_spec == "minute":
+        outfile = f"omni_min_by_bz_vsw_{year}.lst"
+    else:
+        raise ValueError("data_spec must be 'hourly' or 'minute'")
+    return outfile
+
 def fetch_omni_data(year, outdir, data_spec="hourly"):
     """
     Fetches OMNI data for a given year.
@@ -43,17 +52,17 @@ def fetch_omni_data(year, outdir, data_spec="hourly"):
         params["vars"] = [id_Kp, id_Dst, id_F107]
         params["res"] = "hour"
         params["spacecraft"] = "omni2"
-        outfile = f"omni2_kp_ae_dst_f107_{year}.lst"
     elif data_spec == "minute":
         # Amps Params
         # vars 15, 16, 21 for  By, Bz, Vsw
-        id_By = "15"
-        id_Bz = "16"
+        id_By = "17"
+        id_Bz = "18"
         id_Vsw = "21"
         params["vars"] = [id_By, id_Bz, id_Vsw]
         params["res"] = "min"
         params["spacecraft"] = "omni_min"
-        outfile = f"omni_min_by_bz_vsw_{year}.lst"
+
+    outfile = get_output_filename(year, data_spec)
 
 
 
@@ -65,7 +74,7 @@ def fetch_omni_data(year, outdir, data_spec="hourly"):
     print("response.request.url: ", response.request.url)
     print("response.request.method: ", response.request.method)
     print("response: ", response)
-    print("response.text: ", response.text)
+    #print("response.text: ", response.text)
     print("response.content: ", response.content)
     print("response.headers: ", response.headers)
 
@@ -94,4 +103,4 @@ def fetch_omni_data(year, outdir, data_spec="hourly"):
 
 
 # Example usage:
-fetch_omni_data("2021", "omnidata")  # Or fetch_omni_data("2021") for the whole year
+#fetch_omni_data("2021", "omnidata")  # Or fetch_omni_data("2021") for the whole year

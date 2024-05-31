@@ -1,0 +1,33 @@
+
+y_all_feature_keys: ['CHAOS_B_FGM1_0', 'CHAOS_B_FGM1_1', 'CHAOS_B_FGM1_2']
+z_all_feature_keys: ['RAW_Timestamp', 'KP_Timestamp', #'kp_sel',
+            'APEX_QD_LAT', 'APEX_QD_LON', 'APEX_MLT', 'RAW_Longitude', 'RAW_Latitude',
+            'q1', 'q2', 'q3', 'q4',
+            'FGM1_X_sc', 'FGM1_Y_sc', 'FGM1_Z_sc',
+            #'mlt', 'lon.trs',
+            'FGM1_X_nec', 'FGM1_Y_nec', 'FGM1_Z_nec',
+            'chaos7_b_nec_x', 'chaos7_b_nec_y', 'chaos7_b_nec_z',
+            'chaos7_b_lit_nec_y', 'chaos7_b_lit_nec_z', 'chaos7_b_lit_nec_x',
+            'chaos7_b_ext_nec_x', 'chaos7_b_ext_nec_y', 'chaos7_b_ext_nec_z',
+            'chaos7_b_cor_nec_x', 'chaos7_b_cor_nec_y', 'chaos7_b_cor_nec_z',
+            'X', 'Y', 'Z', 'VX', 'VY', 'VZ', 'r.trs',
+              'KP', 'Dst', 'F10.7', 'F10.7-81d',
+              'ORB_OrbitNo', 'q1_fgm32nec', 'q2_fgm32nec', 'q3_fgm32nec', 'q4_fgm32nec',
+                                'q1_fgm22nec', 'q2_fgm22nec', 'q3_fgm22nec', 'q4_fgm22nec',
+                                'q1_fgm12nec', 'q2_fgm12nec', 'q3_fgm12nec', 'q4_fgm12nec',#'nan_share_FLAG',
+            'By', 'Bz', 'Sw', 'By-20m', 'Bz-20m', 'Sw-20m', 'tilt',
+              'amps_b_mag_x', 'amps_b_mag_y', 'amps_b_mag_z', 'amps_b_nec_x', 'amps_b_nec_y', 'amps_b_nec_z',
+            'Spaceweather_Flag', 'HP_Timestamp', 'Hp30',
+              #'ORB_Timestamp', 'ORB_Latitude', 'ORB_Longitude', 'ORB_Radius', 'ORB_MLT'
+       #  'gps_sec', 'q1_fgm32nec', 'q2_fgm32nec', 'q3_fgm32nec', 'q4_fgm32nec', 'lt', 'mjd2000', 'qdlon', 'mlat', 'q1_fgm12nec', 'q2_fgm12nec', 'q3_fgm12nec',
+       # 'q4_fgm12nec', 'q1_fgm22nec', 'q2_fgm22nec', 'q3_fgm22nec',
+       # 'q4_fgm22nec', 'chaos7_b_fgm2_x', 'chaos7_b_fgm2_y', 'chaos7_b_fgm2_z',
+       # 'chaos7_b_fgm3_x', 'chaos7_b_fgm3_y', 'chaos7_b_fgm3_z',
+       # 'chaos7_b_sc_x', 'chaos7_b_sc_y', 'chaos7_b_sc_z', 'FGM2_X_sc', 'FGM2_Y_sc', 'FGM2_Z_sc', 'FGM3_X_sc', 'FGM3_Y_sc',
+       # 'FGM3_Z_sc',
+       # 'FGM2_X_nec', 'FGM2_Y_nec', 'FGM2_Z_nec', 'FGM3_X_nec', 'FGM3_Y_nec',
+       # 'FGM3_Z_nec', 'chaos7_b_lit_nec_y', 'chaos7_b_lit_nec_z', 'chaos7_b_ext_nec_x',
+       # 'chaos7_b_ext_nec_y', 'chaos7_b_ext_nec_z',  'chaos7_b_cor_nec_x', 'chaos7_b_cor_nec_y', 'chaos7_b_cor_nec_z',
+       # 'chaos7_b_lit_nec_x'
+              ]
+

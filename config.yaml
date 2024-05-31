@@ -6,11 +6,15 @@ pandas_inplace: False
 log_level: 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
 
 goce_data_path: /Volumes/Crucial X8/GOCE/rawdata/ # Previously base_path
-write_path: /Volumes/Crucial X8/satellite_intermediate2/
+write_path: /Volumes/Crucial X8/satellite_intermediate3/
 
-space_weather_path: /Users/kevinstyp/Downloads/GOCE/all_kp_dst_indices_v3.lst
-amps_params_path: /Users/kevinstyp/Downloads/GOCE/amps_params.lst
+use_cache: True
+auxiliary_data_path: ./data/auxiliary_params/
+#space_weather_path: /Users/kevinstyp/Downloads/GOCE/all_kp_dst_indices_v3.lst
+#amps_params_path: /Users/kevinstyp/Downloads/GOCE/amps_params.lst
 hp30_path: /Users/kevinstyp/Downloads/GOCE/all_hp30.lst
+
+orbit_counter_path: "/Volumes/Crucial X8/GOCE/ORBCNT/GO_ORBCNT_20090317T231001_20131109T234516_0101.h5"
 
 string_config_file: ???
 
