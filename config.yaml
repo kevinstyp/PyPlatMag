@@ -8,7 +8,7 @@ log_level: 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
 goce_data_path: /Volumes/Crucial X8/GOCE/rawdata/ # Previously base_path
 write_path: /Volumes/Crucial X8/satellite_intermediate3/
 
-use_cache: True
+use_cache: False
 auxiliary_data_path: ./data/auxiliary_params/
 #space_weather_path: /Users/kevinstyp/Downloads/GOCE/all_kp_dst_indices_v3.lst
 #amps_params_path: /Users/kevinstyp/Downloads/GOCE/amps_params.lst
@@ -19,3 +19,5 @@ orbit_counter_path: "/Volumes/Crucial X8/GOCE/ORBCNT/GO_ORBCNT_20090317T231001_2
 string_config_file: ???
 
 string_conversion: 'one-hot' # or 'remove'
+
+nan_share: 0.2

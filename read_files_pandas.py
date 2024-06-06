@@ -142,7 +142,7 @@ for year_month_specifier in config.year_month_specifiers:
 
 
     # Write data to disk
-    data_io.save_df(data, config.write_path, config.satellite_specifier, year_month_specifier)
+    data_io.save_df(data, config.write_path, config.satellite_specifier, year_month_specifier, dataset_name="data")
 
     # TODO: What is going with those 'string_features'? Did not use them here
 
