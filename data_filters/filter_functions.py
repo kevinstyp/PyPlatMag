@@ -91,8 +91,8 @@ def flag_outlier(data, y_features, orbit_removal=True, mag_columns=['FGM1_X', 'F
     return data
 
 
-def filter_samples_by_interpolation_distance(data):
-    data['Interp_Distance_Flag'] = 0
-    data.loc[data['fgm_gapsize'] > 17, 'Interp_Distance_Flag'] = 1
+def flag_samples_by_interpolation_distance(data):
+    data['Interpolation_Distance_Flag'] = 0
+    data.loc[data['fgm_gapsize'] > 17, 'Interpolation_Distance_Flag'] = 1
     return data
 

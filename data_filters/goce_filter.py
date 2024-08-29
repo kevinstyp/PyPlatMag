@@ -47,7 +47,7 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
     else:
         logger.warning(f"WARNING: No outlier removal, but Flag added.")
 
-    data = ff.filter_samples_by_interpolation_distance(data)
+    data = ff.flag_samples_by_interpolation_distance(data)
     if training:
         logger.info(f"Removing samples with too large interpolation distance from training data")
         data = ff.filter_flag(data, "Interpolation_Distance_Flag")
@@ -55,6 +55,18 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
         logger.warning(f"WARNING: No interpolation distance filtering, but Flag added.")
 
 
+    # TODO: This could be tried to move to 'z_all' instead of dropping
+    # Filter out all columns starting with 'str', related to star trackers and thus positional encoding
+    data = data.drop(list(data.filter(regex='^str.*')), axis=1, errors='ignore')
 
-    x_all, y_all, z_all = training_data.split_dataframe(data, y_features, meta_features)
-    return (x_all, y_all, z_all)
+    # TODO: These are data enrichments, not filtering (old code had solar_activity here as well)
+    # Add Day of Year
+    def add_day_of_year(data):
+        data["DOY"] = data["RAW_Timestamp"].dt.day_of_year
+        return data
+    data = add_day_of_year(data)
+
+
+    #x_all, y_all, z_all = training_data.split_dataframe(data, y_features, meta_features)
+    #return (x_all, y_all, z_all)
+    return data

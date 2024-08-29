@@ -1,3 +1,5 @@
+current_parameters_file: config_goce/electric_current_parameters.h5
+goce_column_description_file: ./GOCE-TLM-packets-description.xlsx
 y_all_feature_keys: [ 'CHAOS_B_FGM1_0', 'CHAOS_B_FGM1_1', 'CHAOS_B_FGM1_2' ]
 meta_features: [ 'RAW_Timestamp', 'KP_Timestamp',
                       'APEX_QD_LAT', 'APEX_QD_LON', 'APEX_MLT', 'RAW_Longitude', 'RAW_Latitude',
