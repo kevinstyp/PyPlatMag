@@ -18,6 +18,8 @@ meta_features: [ 'RAW_Timestamp', 'KP_Timestamp',
                       'By', 'Bz', 'Sw', 'By-20m', 'Bz-20m', 'Sw-20m', 'tilt',
                       'amps_b_mag_x', 'amps_b_mag_y', 'amps_b_mag_z', 'amps_b_nec_x', 'amps_b_nec_y', 'amps_b_nec_z',
                       'Spaceweather_Flag', 'HP_Timestamp', 'Hp30',
+                 'Magnetic_Activity_Flag', 'Outlier_Flag', 'Interpolation_Distance_Flag', 'DOY',
+                 'weightings', 'NaN_Flag',
 
   #'kp_sel',
   #'mlt', 'lon.trs',
@@ -53,3 +55,19 @@ essential_calibration_keys: [ 'q1', 'q2', 'q3', 'q4', 'MHT00000', 'PHD94001', 'P
                                   'q2_fgm22nec', 'q3_fgm22nec', 'q4_fgm22nec', 'q1_fgm32nec', 'q2_fgm32nec', 'q3_fgm32nec',
                                   'q4_fgm32nec', 'lt', 'mjd2000', 'qdlat', 'qdlon', 'mlat', 'mlt',
 ]
+
+train_config:
+  use_amps: True
+  filter_std: True
+  filter_correlation: True
+  training_file_path: 'config_goce/'
+  test_split: 0.2
+  neural_network_variant: 0
+  learn_config:
+    epochs: 25
+    batch_size: 1500
+    learning_rate: 0.01
+    optimizer: 'adam'
+    loss: 'mean_squared_error'
+    first_extra: 50
+    drop_every: 90

@@ -32,7 +32,7 @@ def nan_application(year_month_specifiers_list, save_path, satellite_specifier, 
         df = df.reset_index(drop=True)
 
         # Mark all occurings of Nans which are not in the meta features
-        list_of_indices = df.index.difference(df.drop(meta_features, axis=1).dropna(axis='index').index).tolist()
+        list_of_indices = df.index.difference(df.drop(meta_features, axis=1, errors='ignore').dropna(axis='index').index).tolist()
         print("len(list_of_indices): ", len(list_of_indices))
         df['NaN_Flag'] = 0
         # z_all['NaN_Flag'][list_of_indices] = 1
@@ -178,7 +178,7 @@ def nan_determination(year_month_specifiers, save_path, satellite_specifier, met
         print("df[RAW_Timestamp][0]: ", df["RAW_Timestamp"][0])
 
         # Remove meta features from df as they are not used for training and may contain NaNs
-        df = df.drop(columns=meta_features)
+        df = df.drop(columns=meta_features, errors='ignore')
 
         # x_all, y_all, z_all, features_to_drop = training_procedure.filter_nan_share(x_all, y_all, z_all, nan_share=nan_share, return_features=True)
         df_column_nancount = dict.fromkeys(df.columns, 0)

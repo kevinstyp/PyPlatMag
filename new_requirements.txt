@@ -1,4 +1,5 @@
-
+numpy
 pyquaternion
 pyyaml???
 python-box
+tables

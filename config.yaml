@@ -1,6 +1,6 @@
 satellite_specifier: 'GOCE'
 
-year_month_specifiers: ["201002"] # ["200912"]
+year_month_specifiers: ["201001"] # ["200912"]
 
 pandas_inplace: False
 log_level: 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
