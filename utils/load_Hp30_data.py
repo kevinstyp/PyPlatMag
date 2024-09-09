@@ -1,7 +1,12 @@
-from datetime import datetime
-from lib.get_Kp_index import getKpindex
-import pandas as pd
+import logging
 import os
+from datetime import datetime
+
+import pandas as pd
+
+from lib.get_Kp_index import getKpindex
+
+logger = logging.getLogger(__name__)
 
 def get_output_filename(year, outdir="./data/auxiliary_params/"):
     #return f"hp30_{year}.h5"
@@ -37,12 +42,13 @@ def fetch_Hp30_data(year, outdir="./data/auxiliary_params/"):
     print("hp30_df.shape: ", hp30_df.shape)
     print("hp30_df.dtypes: ", hp30_df.dtypes)
     outfile = get_output_filename(year, outdir)
+    logger.debug(f"outfile: {outfile}")
 
     # mkdir outdir if not exists
-    if not os.path.exists(outfile):
-        os.makedirs(outfile)
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     # write to h5 file
-    hp30_df.to_hdf(f"{outfile}", key='df', mode='w')
+    hp30_df.to_hdf(outfile, key='df', mode='w')
 
     pass

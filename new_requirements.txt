@@ -3,3 +3,4 @@ pyquaternion
 pyyaml???
 python-box
 tables
+pandas

@@ -31,23 +31,15 @@ def unpack_amps_params_file_to_df(auxiliary_data_path, year_month, use_cache=Tru
                                    names=['year', 'dayofyear', 'hour', 'minute', "By", "Bz", "Sw"])
     logger.debug(f"amps_params_array: {amps_params_array}")
     logger.debug(f"amps_params_array.shape: {amps_params_array.shape}")
-
     amps_params_df = pd.DataFrame(columns=["Amps_Timestamp", "gps_sec", "By", "Bz", "Sw"])
-
 
     timestamps = [datetime.datetime.strptime(amps_param[0] + ' ' + amps_param[1] + ' ' + amps_param[2] + ' ' + amps_param[3], '%Y %j %H %M') for
                   amps_param in amps_params_array]
-    print("timestamps 2: ", timestamps[:10])
-
     gps_times = th.datetime_to_gps(timestamps)
-    print("second gps_times: ", gps_times[:10])
-    print("timestamps.shape: ", len(timestamps))
-    print("gps_times.shape: ", len(gps_times))
 
     amps_params_df = amps_params_df.append(pd.DataFrame({"Amps_Timestamp": timestamps, "gps_sec": gps_times,
                                        "By": amps_params_array['By'], "Bz": amps_params_array['Bz'], "Sw": amps_params_array['Sw'],
                                        }))
-
     return amps_params_df
 
 def enrich_df_with_amps_params_data(data, amps_params_df):
@@ -91,20 +83,15 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     amps_params_df.loc[amps_params_df['Bz-20m'].isnull(), 'Spaceweather_Flag'] = 1.
     amps_params_df.loc[amps_params_df['Sw-20m'].isnull(), 'Spaceweather_Flag'] = 1.
 
-    # TODO: Can this happen after values have been filled?
-    print("before amps_params_df['By-20m'].isnull().sum(): ", amps_params_df['By-20m'].isnull().sum())
-    print("before amps_params_df['Sw-20m'].isnull().sum(): ", amps_params_df['Sw-20m'].isnull().sum())
+    # TODO: Can this happen after values have been filled? It's exactly 9
+    logger.debug(f"Sum of nulls in By-20m before filling: {amps_params_df['By-20m'].isnull().sum()}")
+    logger.debug(f"Sum of nulls in Sw-20m before filling: {amps_params_df['Sw-20m'].isnull().sum()}")
     by20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["By-20m"], kind='linear', fill_value="extrapolate")
     data["By-20m"] = by20m_interpolater(data["gps_sec"])
     bz20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Bz-20m"], kind='linear', fill_value="extrapolate")
     data["Bz-20m"] = bz20m_interpolater(data["gps_sec"])
     sw20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Sw-20m"], kind='linear', fill_value="extrapolate")
     data["Sw-20m"] = sw20m_interpolater(data["gps_sec"])
-
-    print("after amps_params_df['By-20m'].isnull().sum(): ", amps_params_df['By-20m'].isnull().sum())
-    print("after data['By-20m'].isnull().sum(): ", data['By-20m'].isnull().sum())
-    print("after amps_params_df['Sw-20m'].isnull().sum(): ", amps_params_df['Sw-20m'].isnull().sum())
-    print("after data['Sw-20m'].isnull().sum(): ", data['Sw-20m'].isnull().sum())
 
     # Find Nan values in By-20m, Bz-20m, Sw-20m and set Spaceweather_Flag to 1. The rest got meaningfully interpolated
     data.loc[data['By-20m'].isnull(), 'Spaceweather_Flag'] = 1.
@@ -116,11 +103,11 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     logger.debug(f"data.loc[data['Spaceweather_Flag'] == 1., 'By']: {data.loc[data['Spaceweather_Flag'] == 1., 'By']}")
     logger.debug(f"data.loc[data['Spaceweather_Flag'] == 1., 'Bz']: {data.loc[data['Spaceweather_Flag'] == 1., 'Bz']}")
     logger.debug(f"data.loc[data['Spaceweather_Flag'] == 1., 'Sw']: {data.loc[data['Spaceweather_Flag'] == 1., 'Sw']}")
-    # Print out max values of the BY, BZ, SW columns
+    # Log max values of the BY, BZ, SW columns
     logger.debug(f"data['By-20m'].max() raw: {data['By-20m'].max()}")
     logger.debug(f"data['Bz-20m'].max() raw: {data['Bz-20m'].max()}")
     logger.debug(f"data['Sw-20m'].max() raw: {data['Sw-20m'].max()}")
-    # Print out max values with spaceweather flag set to 0
+    # Log max values with spaceweather flag set to 0
     logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max()}")
     logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max()}")
     logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max()}")
@@ -139,33 +126,21 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     logger.debug(f"epoch_year_month: {epoch_year + (epoch_month-1.)/12.}")
     #dipole_year_month = Dipole(epoch_year)
     data["tilt"] = dipole_year_month.tilt(data.index)
-    print("tilt_values: ", data["tilt"])
+    logger.debug(f"tilt_values: {data['tilt']}")
     # Convert the lat/lon/height from geocentric to geodetic with geoc2geod function from the ppigrf package
-    # TODO: This ("geod2geoc") seems like a function naming mismatch,
-    #  the description actually says it converts from geocentric to geodetic
-    #  which is exactly what we actually need here.
-    # Our lat and height are in geocentric coordinates
-    #print("X, Y, Z:", data[["X", "Y", "Z"]].head(10))
-    print("lat.trs, lon and r.trs:", data[["RAW_Latitude", "RAW_Longitude", "r.trs"]].head(10))
-    # theta, r, B_th, B_r = ppigrf.ppigrf.geod2geoc(data["RAW_Latitude"], data["r.trs"]*1000, np.zeros_like(data["RAW_Latitude"]), np.zeros_like(data["RAW_Latitude"]))
-    # 90 - latitudes: Converts the latitudes to the expected Colatitudes, defined from 0 to 180 degrees
-    print("90 - data[RAW_Latitude] :", 90 - data["RAW_Latitude"])
+    # '90 - latitudes': Converts the latitudes to the expected Colatitudes, defined from 0 to 180 degrees
     gdlat, height, _, _ = ppigrf.ppigrf.geoc2geod(90 - data["RAW_Latitude"], data["r.trs"], np.zeros_like(data["RAW_Latitude"]),
                                                   np.zeros_like(data["RAW_Latitude"]))
-    # print("lat.trs and r.trs:", data[["RAW_Latitude", "r.trs"]].head(10))
     logger.debug(f"gdlat: {gdlat}")
     logger.debug(f"height: {height}")
-    # TODO: get_B_space() claims to use glat and glon as 'geographic' coordinates,
-    #  but the function actually uses geodetic coordinates (according to KML).
-    #  This is also supported by the height parameter being requested in geodetic coordinates.
-    import time
-    start_overall = time.process_time()
+    # get_B_space() claims to use glat and glon as 'geographic' coordinates,
+    # but the function actually uses geodetic coordinates (according to KML).
+    # This is also supported by the height parameter being requested in geodetic coordinates.
     B_e, B_n, B_u = pyamps.get_B_space(glat=gdlat, glon=data["RAW_Longitude"].values, height=height,
                                        time=data["RAW_Timestamp"].values,
                                        v=data["Sw-20m"].values, By=data["By-20m"].values, Bz=data["Bz-20m"].values,
                                        tilt=data["tilt"].values, f107=data["F10.7"].values)
-    logger.info("Time for get_B_Space in AMPS data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
-    print("b_space: ", B_e, B_n, B_u)
+    logger.debug(f"b_space: {B_e}, {B_n}, {B_u}")
     # Convert the geodetic return values of the get_B_space() function to geocentric coordinates
     # TODO: Sanity check with returned "new" geocentric coordinates
     _, _, B_th, B_r = ppigrf.ppigrf.geod2geoc(gdlat, height, B_n, B_u)
@@ -176,7 +151,7 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     B_n = -B_th
     # B_n, B_e, B_c are the N, E, C components from NEC
     amps_nec = np.column_stack([B_n, B_e, B_c])
-    print("amps_nec: ", amps_nec)
+    logger.debug(f"amps_nec: {amps_nec}")
     # Now we can compute the magnetic field vector in the spacecraft frame by inverting the FGM_to_NEC quaternions and applying them
     # in the opposite direction to the B_e, B_n, B_c components
     quat = np.column_stack([data[quaternion_columns[0]].values, data[quaternion_columns[1]].values,
@@ -187,44 +162,8 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     #     amps_mag_old[i] = np.dot(rotation_matrices[i], amps_nec[i])
     # del rotation_matrices
 
-    #my_quaternions = Quaternion(quat)
-    print("quat.shape: ", quat.shape)
-    print("quat: ", quat.dtype)
-    print("quat[:4]: ", quat[:4])
-    #my_quaternions = Quaternion(w=quat[:, 3], x=quat[:, 0], y=quat[:, 1], z=quat[:, 2])
-    #my_quaternions = [Quaternion(w, x, y, z) for x, y, z, w in quat]
-    time1 = time.process_time()
     my_quaternions_inversed = [Quaternion(w, x, y, z).inverse for x, y, z, w in quat]
-    print("my_quaternions_inversed[:4]: ", my_quaternions_inversed[:4])
     amps_mag = np.array([q.rotate(vec) for q, vec in zip(my_quaternions_inversed, amps_nec)])
-    print("amps_nec: ", amps_nec.dtype)
-    print("amps_mag: ", amps_mag.dtype)
-    print("Time for Pyquaternion: ", time.process_time() - time1)
-    #amps_mag = my_quaternions_inversed.rotate(amps_nec)
-
-    # amps_mag = mtq.m_multiplyQuaternion(quat,
-    #                                     mtq.m_multiplyQuaternion(np.c_[amps_nec,
-    #                                                                    np.zeros(amps_nec.shape[0])
-    #                                                              ],
-    #                                                              mtq.m_inverseQuaternion(quat)
-    #                                                              )
-    #                                     )[:, 0:3]
-
-    print("amps_mag: ", amps_mag)
-
-    # import rowan
-    # time2 = time.process_time()
-    # # Important: Note the order change in the quaternion components
-    # quats_inversed = [rowan.normalize(rowan.inverse(np.array([w, x, y, z]))) for x, y, z, w in quat]
-    # print("quats_inversed[:4]: ", quats_inversed[:4])
-    # print("first : ", rowan.rotate(quats_inversed[0], amps_nec[0]))
-    # print("rotation_matrix: ", rowan.to_matrix(quats_inversed[0]))
-    # print("rotation_matrices: ", rowan.to_matrix(quats_inversed))
-    # # print("q1.rotate(amps_nec): ", q1.rotate(amps_nec))
-    # alternative_amps_mag = np.array([rowan.rotate(q, vec) for q, vec in zip(quats_inversed, amps_nec)])
-    # print("alternative_amps_mag: ", alternative_amps_mag)
-    # print("Time for rowan: ", time.process_time() - time2)
-
 
     data["amps_b_mag_x"] = amps_mag[:, 0]
     data["amps_b_mag_y"] = amps_mag[:, 1]
@@ -235,10 +174,4 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     # now set the respective rows to zero for latitudes below 40 / above -40 degrees (the model is not valid for these latitudes)
     data.loc[(data["APEX_QD_LAT"] > -40) & (data["APEX_QD_LAT"] < 40),
              ["amps_b_mag_x", "amps_b_mag_y", "amps_b_mag_z", "amps_b_nec_x", "amps_b_nec_y", "amps_b_nec_z"]] = 0.
-    # test this with prints
-    print("amps_b_mag_x should be zero here: ",
-          data.loc[(data["APEX_QD_LAT"] > -40) & (data["APEX_QD_LAT"] < 40)]["amps_b_mag_x"][:5])
-    print("amps_b_mag_x should NOT be zero here, < -40 lat: ", data.loc[data["APEX_QD_LAT"] < -40]["amps_b_mag_x"][:5])
-    print("amps_b_mag_x should NOT be zero here, > 40 lat: ", data.loc[data["APEX_QD_LAT"] > 40]["amps_b_mag_x"][:5])
-
     return data

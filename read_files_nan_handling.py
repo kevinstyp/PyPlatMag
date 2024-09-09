@@ -9,13 +9,12 @@ from preprocessing import nan_handler
 from utils import data_io
 
 config = Box.from_yaml(filename="./config.yaml", Loader=yaml.SafeLoader)
-print(config)
 config_goce = Box.from_yaml(filename="./config_goce.yaml", Loader=yaml.SafeLoader)
-print(config_goce)
-
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
+logger.info(f"config: {config}")
+logger.info(f"config_goce: {config_goce}")
 
 # determine nan
 # basically from logic wise start in the back with use_cache

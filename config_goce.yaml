@@ -62,12 +62,12 @@ train_config:
   filter_correlation: True
   training_file_path: 'config_goce/'
   test_split: 0.2
-  neural_network_variant: 0
+  neural_network_variant: 3
   learn_config:
-    epochs: 25
+    epochs: 100
     batch_size: 1500
     learning_rate: 0.01
     optimizer: 'adam'
     loss: 'mean_squared_error'
-    first_extra: 50
+    first_extra: 0 #50
     drop_every: 90

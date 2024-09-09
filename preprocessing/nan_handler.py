@@ -24,10 +24,10 @@ def nan_application(year_month_specifiers_list, save_path, satellite_specifier, 
         print("year_month: ", year_month_specifier)
         df = data_io.read_df(save_path, satellite_specifier, [year_month_specifier], dataset_name="data")
 
-        print("df.columns before features_to_drop: ", list(df.columns))
+        print("df.columns before features_to_drop: ", df.columns.tolist())
         # features_to_drop
         df = df.drop(columns=features_to_drop, errors='ignore')
-        print("df.columns after features_to_drop: ", list(df.columns))
+        print("df.columns after features_to_drop: ", df.columns.tolist())
 
         df = df.reset_index(drop=True)
 
@@ -76,7 +76,7 @@ def nan_determination_merge(year_month_specifiers_list, save_path, satellite_spe
     # Load monthly data for mean and count and add them up
     for year_month_specifier in year_month_specifiers_list:
         monthly_path = get_save_path(save_path, satellite_specifier) + year_month_specifier + "/"
-        print("monthly_path: ", monthly_path)
+        logger.debug(f"monthly_path: {monthly_path}")
         with open(monthly_path + "df_column_nancount.pickle", "rb") as f:
             df_column_nancount = pickle.load(f)
         with open(monthly_path + "df_column_mean.pickle", "rb") as f:
@@ -96,23 +96,8 @@ def nan_determination_merge(year_month_specifiers_list, save_path, satellite_spe
     logger.info(f"Total number of columns: {len(df_columns)}")
 
     # TODO: Remove these lines, if unnecessary
-    global_df_column_mean = dict.fromkeys(df_columns, 0)
-    global_df_column_count = dict.fromkeys(df_columns, 0)
-
-    first_column = df_columns[0]
-    second_column = df_columns[1]
-    third_column = df_columns[2]
-    print("first_column: ", first_column)
-    print("second_column: ", second_column)
-    print("third_column: ", third_column)
-    print("df_column_count_list[0]: ", df_column_nancount_list[0])
-    print("df_column_mean_list[0]: ", df_column_mean_list[0])
-    print("df_column_count_list[0][first_column]: ", df_column_nancount_list[0][first_column])
-    print("df_column_mean_list[0][first_column]: ", df_column_mean_list[0][first_column])
-    print("df_column_count_list[0][second_column]: ", df_column_nancount_list[0][second_column])
-    print("df_column_mean_list[0][second_column]: ", df_column_mean_list[0][second_column])
-    print("df_column_count_list[0][third_column]: ", df_column_nancount_list[0][third_column])
-    print("df_column_mean_list[0][third_column]: ", df_column_mean_list[0][third_column])
+    #global_df_column_mean = dict.fromkeys(df_columns, 0)
+    #global_df_column_count = dict.fromkeys(df_columns, 0)
 
     # Nancount list contains a list for each column-key, which contains the nancounts for each month
     nancount_list = [[dictionary[column] if column in dictionary else 0 for dictionary in df_column_nancount_list] for column in
@@ -171,11 +156,8 @@ def nan_determination_merge(year_month_specifiers_list, save_path, satellite_spe
 
 
 def nan_determination(year_month_specifiers, save_path, satellite_specifier, meta_features=[]):
-    print("year_month_specifiers: ", year_month_specifiers)
     for year_month_specifier in year_month_specifiers:
-        print("year_month_specifier: ", year_month_specifier)
         df = data_io.read_df(save_path, satellite_specifier, [year_month_specifier], dataset_name="data")
-        print("df[RAW_Timestamp][0]: ", df["RAW_Timestamp"][0])
 
         # Remove meta features from df as they are not used for training and may contain NaNs
         df = df.drop(columns=meta_features, errors='ignore')
@@ -186,7 +168,7 @@ def nan_determination(year_month_specifiers, save_path, satellite_specifier, met
         df_overall = df.shape[0]
 
         for i, c in enumerate(df.columns):
-            print(str(i) + ":\t" + str(c) + ", NaN: " + str(df[c].isna().sum()) + "/" + str(df[c].shape[0]))
+            logger.debug(f"{str(i)}:\t {str(c)}, NaN:  {str(df[c].isna().sum())}/ {str(df[c].shape[0])}")
             df_column_nancount[c] = df[c].isna().sum()
             df_column_mean[c] = df[c].mean()
 

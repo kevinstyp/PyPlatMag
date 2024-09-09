@@ -18,30 +18,10 @@ from amps_preprocessor import enrich_df_with_amps_data, enrich_df_with_amps_para
 from utils import data_io
 
 config = Box.from_yaml(filename="./config.yaml", Loader=yaml.SafeLoader)
-print(config)
-#ch = logging.StreamHandler()
-#logging.basicConfig(filename='myapp.log', level=logging.DEBUG, )
-# create formatter
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
-# #logger = logging.getLogger('pyplatmag')
-# #logger.setLevel(config.log_level)
-# logger.setLevel(logging.DEBUG)
-#
-# print("__package__:", __package__)
-#
-# # create console handler and set level to debug
-# ch = logging.StreamHandler()
-# ch.setLevel(logger.level)
-#
-
-#
-# # add formatter to ch
-# ch.setFormatter(formatter)
-#
-# # add ch to logger
-# logger.addHandler(ch)
+logger.info(f"config: {config}")
 
 for year_month_specifier in config.year_month_specifiers:
     first_time = time.process_time()
@@ -99,6 +79,10 @@ for year_month_specifier in config.year_month_specifiers:
     del amps_params_df, sw_df, hp30_df
 
     start_overall = time.process_time()
+    #TODO: Move this line to a better place?
+    # Removes NaN entries where positional arguments are missing (e.g., latitude and quaternions)
+    data = data[data['APEX_QD_LAT'].between(-90., 90.)]
+    # TODO: It seems that quats are float32, whereas they were float64 before in the older code
     data = enrich_df_with_amps_data(data)
     logger.info("Time for enriching with AMPS data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
 
@@ -117,11 +101,11 @@ for year_month_specifier in config.year_month_specifiers:
                                 'FGM3_Z_nec',
                                 ]
     data = data.drop(do_not_consider_features, axis=1, errors='ignore')
-    print("data-after not consider: ", data.shape)
+    logger.info(f"Data shape after removing not-consider features: {data.shape}")
 
     # TODO Orbit counter: Move to GOCE Connector
     orbit_counter_df = pd.read_hdf(config.orbit_counter_path, "df").add_prefix("ORB_")
-    print("orbit_counter_df: ", orbit_counter_df.head(2))
+    logger.debug(f"orbit_counter_df: {orbit_counter_df.head(2)}")
     data['copy_egg_iaq_index'] = data.index
     # data['copy_gps_sec'] = data.index
     data = data.reset_index(drop=True)
@@ -134,7 +118,6 @@ for year_month_specifier in config.year_month_specifiers:
     data = data.set_index("RAW_Timestamp", drop=False)
     logger.debug(f"Data head after orbit counter merge: {data.head(3)}")
     if {'ORB_Timestamp', 'ORB_Latitude', 'ORB_Longitude', 'ORB_Radius', 'ORB_MLT'}.issubset(data.columns):
-        print("exectued timestamp removal 2")
         data = data.drop(['ORB_Timestamp', 'ORB_Latitude', 'ORB_Longitude', 'ORB_Radius', 'ORB_MLT'], axis=1)
 
     # TODO: To be honest, this should go to the training: Weightings are only needed for training (if wanted)

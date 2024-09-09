@@ -49,6 +49,9 @@ def unpack_kp_dst_file_to_df(auxiliary_data_path, year_month, use_cache=True):
     kp_df.loc[kp_df['F10.7'] >= 999., 'Spaceweather_Flag'] = 1.
     logger.info(f"Spaceweather Flag after F10.7: {kp_df['Spaceweather_Flag'].sum()}")
 
+    # set types of KP to int64 and Dst to float64
+    kp_df["KP"] = kp_df["KP"].astype(np.int64)
+    kp_df["Dst"] = kp_df["Dst"].astype(np.float64)
     return kp_df
 
 
@@ -62,33 +65,14 @@ def unpack_hp30_file_to_df(auxiliary_data_path, year_month, use_cache=True):
     return hp30_df
 
 def enrich_df_with_kp_data(data, kp_df, with_kp=False):
-    print("kp_df.head(5): ", kp_df.head(5))
-    print("data['gps_sec']: ", data['gps_sec'])
-    print("kp_df['gps_sec']: ", kp_df['gps_sec'])
-    print("data.shape: ", data.shape)
-    # by_interpolater = interpolate.interp1d(kp_df["gps_sec"], kp_df["By"], kind='linear', fill_value="extrapolate")
-    # data["By"] = by_interpolater(data["gps_sec"])
-    # bz_interpolater = interpolate.interp1d(kp_df["gps_sec"], kp_df["Bz"], kind='linear', fill_value="extrapolate")
-    # data["Bz"] = bz_interpolater(data["gps_sec"])
-    # sw_interpolater = interpolate.interp1d(kp_df["gps_sec"], kp_df["Sw"], kind='linear', fill_value="extrapolate")
-    # data["Sw"] = sw_interpolater(data["gps_sec"])
+    logger.debug(f"kp_df.head(5): {kp_df.head(5)}")
+    logger.debug(f"data.shape: {data.shape}")
     dst_interpolater = interpolate.interp1d(kp_df["gps_sec"], kp_df["Dst"], kind='linear', fill_value="extrapolate")
     data["Dst"] = dst_interpolater(data["gps_sec"])
     f107_interpolater = interpolate.interp1d(kp_df["gps_sec"], kp_df["F10.7"], kind='linear', fill_value="extrapolate")
     data["F10.7"] = f107_interpolater(data["gps_sec"])
-    print("dataDst].shape: ", data["Dst"].shape)
-    print("data[Dst]: ", data["Dst"])
-    # data["By-20m"] = data["By"].rolling('20min', min_periods=1).mean()
-    # data["Bz-20m"] = data["Bz"].rolling('20min', min_periods=1).mean()
-    # data["Sw-20m"] = data["Sw"].rolling('20min', min_periods=1).mean()
-    # print("data[By]: ", data["By"])
-    # print("data[By-20m]: ", data["By-20m"])
-    # print sum of spaceweather flag
-    print("kp_df[Spaceweather_Flag].sum(): ", kp_df["Spaceweather_Flag"].sum())
-    print("data.shape: ", data.shape)
-    print("kp_df.shape: ", kp_df.shape)
-    #data["Spaceweather_Flag"] = kp_df["Spaceweather_Flag"]
 
+    logger.info(f"Spaceweather Flag after Dst: {kp_df['Spaceweather_Flag'].sum()}")
     # TODO: This does not look too well here!?
     data = data.reset_index(drop=True)
     data = pd.merge_asof(data, kp_df[["KP_Timestamp", "Spaceweather_Flag"]], on=None, left_on="RAW_Timestamp", right_on="KP_Timestamp",  #
@@ -108,13 +92,11 @@ def enrich_df_with_kp_data(data, kp_df, with_kp=False):
 
     data = data.set_index("RAW_Timestamp", drop=False)
     data["Spaceweather_Flag"] = data["Spaceweather_Flag"].rolling('1min', min_periods=1).max()
-    print("data[Spaceweather_Flag].sum(): ", data["Spaceweather_Flag"].sum())
+    logger.info(f"Spaceweather Flag after KP merge: {data['Spaceweather_Flag'].sum()}")
     return data
 
 def enrich_df_with_hp_data(data, hp30_df):
-    print("hp30_df.head(5): ", hp30_df.head(5))
-    print("data.head(5): ", data.head(5))
-
+    logger.debug(f"hp30_df.head(5): {hp30_df.head(5)}")
     data = data.reset_index(drop=True)
     data = pd.merge_asof(data, hp30_df[["HP_Timestamp", "Hp30"]], on=None, left_on="RAW_Timestamp", right_on="HP_Timestamp",  #
                          left_index=False, right_index=False, by=None,
@@ -122,9 +104,5 @@ def enrich_df_with_hp_data(data, hp30_df):
                          allow_exact_matches=True,
                          direction='backward')
     data = data.set_index("RAW_Timestamp", drop=False)
-
-    print("data.head(5): ", data.head(5))
-    print("data['Hp30'].head(5): ", data['Hp30'].head(5))
-    print("data['HP_Timestamp'].head(5): ", data['HP_Timestamp'].head(5))
-
+    logger.debug(f"hp30_df.head(5): {hp30_df.head(5)}")
     return data

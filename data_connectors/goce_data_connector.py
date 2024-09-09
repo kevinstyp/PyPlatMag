@@ -7,8 +7,8 @@ import pandas as pd
 from data_connectors.data_connector import Connector
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
 
+#TODO: Clean up in this class
 class GOCEConnector(Connector):
     def __init__(self, base_path):
         self.data = None
@@ -37,12 +37,7 @@ class GOCEConnector(Connector):
             else:
                 whole_file_name = self.base_path + self.many_params.get(i) + year_month_specifier + self.base_name2
 
-            # if i == 0:
-            #     iter_data = pd.read_csv(whole_file_name, index_col=0)
-            # else:
-            #     iter_data = pd.read_csv(whole_file_name)
             logger.info(f"reading CSV: {whole_file_name}")
-
 
             if i == 1:
                 if h5:
@@ -54,9 +49,8 @@ class GOCEConnector(Connector):
                     iter_data = pd.read_hdf(whole_file_name, "df")
                 else:
                     iter_data = pd.read_csv(whole_file_name, index_col=0, compression="gzip", sep=',')
-            print("i: " + str(i) + "iter_data: " + str(iter_data.shape))
-            print(iter_data.head(2))
-            print(iter_data.columns.tolist())
+            logger.info(f"data chunk #{str(i)}: {str(iter_data.shape)}")
+            logger.debug(f"columns of data chunk: {iter_data.columns.tolist()}")
             if i == 0:
                 data = iter_data
             else:
@@ -68,7 +62,7 @@ class GOCEConnector(Connector):
                     egg_iaq_index = True
                 cols_to_use = iter_data.columns.difference(data.columns)
                 # dfNew = merge(df, df2[cols_to_use], left_index=True, right_index=True, how='outer')
-                print("cols_to_use bef:", cols_to_use)
+                logger.debug(f"Newly added columns from data chunk: {cols_to_use}")
                 # print("cols_to_use bef:", (gps_sec, egg_iaq_index))
                 if gps_sec:
                     cols_to_use = cols_to_use.append(pd.Index(['gps_sec']))
@@ -76,14 +70,8 @@ class GOCEConnector(Connector):
                     cols_to_use = cols_to_use.append(pd.Index(['egg_iaq_index']))
                 logger.debug(f"egg_iaq_index: {egg_iaq_index}")
                 logger.debug(f"gps_sec: {gps_sec}")
-                # maybe add egg_iaq_index?
-                # print("cols_to_use aft:", cols_to_use)
-                # print("both data before: ")
-                # print(data.head(2))
-                # print(iter_data[cols_to_use].head(2))
-                if i == 1:
-                    print("data-head before first merge: ", data.head(2))
 
+                if i == 1:
                     # data['copy_egg_iaq_index'] = data.index
                     data['copy_egg_iaq_index'] = iter_data.index
                     # data = data.merge(iter_data[cols_to_use], left_on="gps_sec", right_on="gps_sec", how="right")#on="egg_iaq_index")
@@ -115,13 +103,12 @@ class GOCEConnector(Connector):
                     # print("data-head after join", data.head(2))
                 # print("data-head", data.head(2))
 
-            print("data-shape: ", data.shape)
-            print("\n\n---\n\n")
-        print("data: ", data.shape)
-        print("data: ", data.head(3))
+            logger.info(f"Current data shape: {data.shape}")
+            logger.info(f"\n---\n")
 
         ### Renaming to my conventions
         # 'qdlat' -> 'APEX_QD_LAT'
+        # TODO: Why?? Isn't qdlat the much nicer name??
         data = data.rename(columns={"qdlat": "APEX_QD_LAT"})
         data = data.rename(columns={"qdlon": "APEX_QD_LON"})
         # MLT
@@ -134,6 +121,5 @@ class GOCEConnector(Connector):
         data = data.rename(columns={"chaos7_b_fgm1_x": "CHAOS_B_FGM1_0", "chaos7_b_fgm1_y": "CHAOS_B_FGM1_1",
                                     "chaos7_b_fgm1_z": "CHAOS_B_FGM1_2"})
 
-        logger.info("Time for input connector: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
-        print("input co")
+        logger.info(f"Time for input connector: {str(round(time.process_time() - start_overall, 2))} seconds")
         return data

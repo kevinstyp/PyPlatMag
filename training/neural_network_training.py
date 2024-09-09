@@ -42,7 +42,9 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
     elif neural_net_variant == 3:
         # x_train is a list and first element contains the non-current input data
         # TODO: x_train is not a list anymore: the last {number_of_bisa_neurons} elements are the electric current data
-        model = build_network_goce_pinn(input_shape=(x_train[0].shape[1]), batch_size=batch_size,
+        model = build_network_goce_pinn(input_shape=(x_train.shape[1] - number_of_bisa_neurons),
+                                        #input_shape=(x_train[0].shape[1]),
+                                        batch_size=batch_size,
                                                 number_of_bisa_neurons=number_of_bisa_neurons,
                                                  )
     elif neural_net_variant == 4:
@@ -93,6 +95,12 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
 
     callbacks = [stepdecay]
 
+    print("number_of_bisa_neurons: ", number_of_bisa_neurons)
+    a = [x_train.iloc[:, :-number_of_bisa_neurons]]
+    b = [x_train.iloc[:, i] for i in range(x_train.shape[1] - number_of_bisa_neurons, x_train.shape[1])]
+    print("a: ", a)
+    print("b: ", b)
+
     if neural_net_variant == 0:
         history = model.fit(
             x_train,
@@ -125,13 +133,15 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
             callbacks=callbacks)
     elif neural_net_variant == 3:
         history = model.fit(
-            x_train,
+            [x_train.iloc[:, :-number_of_bisa_neurons]] + [x_train.iloc[:, i] for i in range(x_train.shape[1] - number_of_bisa_neurons, x_train.shape[1])],
             y_train,
             epochs=epochs,
             batch_size=batch_size,
             shuffle=True,
             sample_weight=weightings_train,
-            validation_data=(x_test, y_test, weightings_test),
+            validation_data=(
+                [x_test.iloc[:, :-number_of_bisa_neurons]] + [x_test.iloc[:, i] for i in range(x_test.shape[1] - number_of_bisa_neurons, x_test.shape[1])],
+                y_test, weightings_test),
             callbacks=callbacks)
     else:
         history = model.fit(

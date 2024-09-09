@@ -85,7 +85,7 @@ def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
         #std_indices = np.where(np.std(x_all, axis=0) != 0)
         # Get std_indices with pandas
         std_indices = (x_all.std(axis=0) != 0).index
-        print("std_indices: ", std_indices)
+        logger.debug(f"std_indices: {std_indices}")
         if not os.path.exists(std_file):
             os.makedirs(os.path.dirname(std_file), exist_ok=True)
         with open(std_file, 'wb') as f:
@@ -148,5 +148,22 @@ def scale_data(x_all, training_file_path, year_month_specifiers, use_cache):
     return scaler.transform(x_all)
 
 
-def split_train_test(arrays, test_split):
-    return train_test_split(*arrays, test_size=test_split)
+def split_train_test(arrays, test_split, batch_size):
+    #TODO: Test this through: Is it really necessary to limit ourselves by the batch_size because of the custom implementation
+    # of the layers?
+    split_arrays = train_test_split(*arrays, test_size=test_split)
+    print("split_arrays:", split_arrays)
+    print("type split_arrays: ", type(split_arrays))
+    max_size_train = split_arrays[0].shape[0] - split_arrays[0].shape[0] % batch_size
+    max_size_test = split_arrays[1].shape[0] - split_arrays[1].shape[0] % batch_size
+    print("max_size_train:" , max_size_train)
+    print("max_size_test:" , max_size_test)
+
+    # Limit every second array in split_arrays by max_size
+    split_arrays = [
+        arr[:max_size_train] if i % 2 == 0 else arr[:max_size_test]
+        for i, arr in enumerate(split_arrays)
+    ]
+    print("split_arrays:", split_arrays)
+    print("type split_arrays: ", type(split_arrays))
+    return split_arrays

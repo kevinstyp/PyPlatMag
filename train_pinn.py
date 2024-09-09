@@ -13,13 +13,13 @@ from utils import data_io
 import training.neural_network_training as nn_train
 
 config = Box.from_yaml(filename="./config.yaml", Loader=yaml.SafeLoader)
-print(config)
 config_goce = Box.from_yaml(filename="./config_goce.yaml", Loader=yaml.SafeLoader)
-print(config_goce)
 
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
+logger.info(f"config: {config}")
+logger.info(f"config_goce: {config_goce}")
 
 # Read dataframe for training
 data = data_io.read_df(config.write_path, config.satellite_specifier, config.year_month_specifiers, dataset_name="data_nonan")
@@ -42,7 +42,7 @@ x_all, y_all, z_all, weightings = training_data.split_dataframe(data, config_goc
 # TODO: What about AMPS inclusion: Add CHAOS with AMPS model
 
 
-print("x_all - columns: ", list(x_all.columns))
+logger.info(f"x_all - columns assigned after split: {x_all.columns.tolist()}")
 
 train_config = config_goce.train_config
 
@@ -61,11 +61,11 @@ x_all = training_procedure.scale_data(x_all, train_config.training_file_path, co
 
 print("x_all: ", x_all)
 print("x_all: ", x_all.shape)
-print("x_all - columns: ", list(x_all.columns))
+print("x_all - columns: ", x_all.columns.tolist())
 
 # Now for train / test split
 x_train, x_test, y_train, y_test, el_cu_train, el_cu_test, weightings_train, weightings_test\
-    = training_procedure.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split)
+    = training_procedure.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split, train_config.learn_config.batch_size)
 
 print("x_train.shape: ", x_train.shape)
 print("el_cu_train.shape: ", el_cu_train.shape)

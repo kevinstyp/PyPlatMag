@@ -17,8 +17,8 @@ def build_network_goce_pinn(input_shape, batch_size, #init_raw=None, init_sa=Non
     zeros_initializer = tf.keras.initializers.Zeros()
     custom_initializer = CustomInitializer(mean=1., number_of_biot_savart_neurons=number_of_bisa_neurons)
 
-    inputs_hk = tf.keras.Input(shape=input_shape)
-    dense1 = tf.keras.layers.Dense(384, activation='elu')(inputs_hk) #192 384 #512 #kernel_regularizer='l2'
+    inputs_x = tf.keras.Input(shape=input_shape)
+    dense1 = tf.keras.layers.Dense(384, activation='elu')(inputs_x) #192 384 #512 #kernel_regularizer='l2'
     dense2 = tf.keras.layers.Dense(128, activation='elu')(dense1) #96 128 #192
 
     #outputs = tf.keras.layers.Dense(3)(dense2)
@@ -26,7 +26,7 @@ def build_network_goce_pinn(input_shape, batch_size, #init_raw=None, init_sa=Non
 
     inputs_list = []
     concatenation_list = []
-    inputs_list.append(inputs_hk)
+    inputs_list.append(inputs_x)
     #concatenation_list.append(dense2)
     concatenation_list.append(dense3)
 
@@ -34,10 +34,10 @@ def build_network_goce_pinn(input_shape, batch_size, #init_raw=None, init_sa=Non
     for i in range(number_of_bisa_neurons):
         # inputs_mtq, output_mtq = biot_savar_input(name=str(i), batch_size_input=batch_size, mean_init=4.0,
         #                                           trainable_init=trainable_pinn)
-        inputs_mtq, output_mtq = biot_savart_input(name=str(i), batch_size_input=batch_size, mean_init=1.0,
+        inputs_current, output_current = biot_savart_input(name=str(i), batch_size_input=batch_size, mean_init=1.0,
                                                   trainable_init=trainable_pinn)
-        inputs_list.append(inputs_mtq)
-        concatenation_list.append(output_mtq)
+        inputs_list.append(inputs_current)
+        concatenation_list.append(output_current)
 
     ## Concatenation and final output
     pre_final = tf.keras.layers.Concatenate()(concatenation_list)
