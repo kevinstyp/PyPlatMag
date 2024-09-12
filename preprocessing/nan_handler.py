@@ -42,20 +42,6 @@ def nan_application(year_month_specifiers_list, save_path, satellite_specifier, 
 
         data_io.save_df(df, save_path, satellite_specifier, year_month_specifier, dataset_name="data_nonan")
 
-
-        # TODO: Check if nothing required is happening afterwards
-        # print("len(df.columns): ", len(df.columns))
-        #
-        # print("df[RAW_Timestamp][0]: ", df["RAW_Timestamp"][0])
-        #
-        # print("amps values before: ", df[['amps_b_mag_x', 'amps_b_mag_y', 'amps_b_mag_z']].values)
-        # print("df.isna().sum(): ", df.isna().sum())
-        # print("df.dtypes: ", df.dtypes)
-        # print("df.infer_objects().dtypes: ", df.infer_objects().dtypes)
-        # df = df.infer_objects()
-        # print("amps values after: ", df[['amps_b_mag_x', 'amps_b_mag_y', 'amps_b_mag_z']].values)
-        # print("df.shape: ", df.shape)
-
 def nan_determination_merge(year_month_specifiers_list, save_path, satellite_specifier, nan_share=0.2, essential_calibration_keys=[]):
     df_column_nancount_list = []
     df_column_mean_list = []

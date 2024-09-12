@@ -12,9 +12,12 @@ Downloaded from: https://kp.gfz-potsdam.de/en/data#c42 and https://kp.gfz-potsda
 -----------------------------------
 """
 
+import json
+import logging
+import urllib.request
 from datetime import datetime
-import json, urllib.request
 
+logger = logging.getLogger(__name__)
 
 def __checkdate__(starttime, endtime):
     if starttime > endtime:
@@ -84,17 +87,20 @@ def getKpindex(starttime, endtime, index, status='all'):
             if index not in ['Hp30', 'Hp60', 'ap30', 'ap60', 'Fobs', 'Fadj']:
                 result_s = tuple(data["status"])
         except:
-            print(text)
+            logger.warning(f"json.loads error: {text}")
 
     except NameError as er:
-        print(er)
+        logger.error(f"NameError: {er}")
     except IndexError as er:
-        print(er)
-    except ValueError:
-        print("Error! Wrong datetime string")
-        print("Both dates must be the same format.")
-        print("Datetime strings must be in format yyyy-mm-dd or yyyy-mm-ddTHH:MM:SSZ")
-    except urllib.error.URLError:
-        print("Connection Error\nCan not reach " + url)
+        logger.error(f"IndexError: {er}")
+    except ValueError as er:
+        logger.error("Error! Wrong datetime string")
+        logger.error("Both dates must be the same format.")
+        logger.error("Datetime strings must be in format yyyy-mm-dd or yyyy-mm-ddTHH:MM:SSZ")
+        logger.error(f"ValueError: {er}")
+    except urllib.error.URLError as er:
+        logger.error(f"Connection Error \nCan not reach {url}")
+        logger.error(f"URLError: {er}")
+
     finally:
         return result_t, result_index, result_s

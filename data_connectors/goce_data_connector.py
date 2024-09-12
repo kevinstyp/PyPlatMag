@@ -8,7 +8,7 @@ from data_connectors.data_connector import Connector
 
 logger = logging.getLogger(__name__)
 
-#TODO: Clean up in this class
+#TODO: Clean up in this class, spend some code comments
 class GOCEConnector(Connector):
     def __init__(self, base_path):
         self.data = None
@@ -61,9 +61,7 @@ class GOCEConnector(Connector):
                 elif 'egg_iaq_index' in iter_data.columns:
                     egg_iaq_index = True
                 cols_to_use = iter_data.columns.difference(data.columns)
-                # dfNew = merge(df, df2[cols_to_use], left_index=True, right_index=True, how='outer')
                 logger.debug(f"Newly added columns from data chunk: {cols_to_use}")
-                # print("cols_to_use bef:", (gps_sec, egg_iaq_index))
                 if gps_sec:
                     cols_to_use = cols_to_use.append(pd.Index(['gps_sec']))
                 if egg_iaq_index:
@@ -72,36 +70,14 @@ class GOCEConnector(Connector):
                 logger.debug(f"gps_sec: {gps_sec}")
 
                 if i == 1:
-                    # data['copy_egg_iaq_index'] = data.index
                     data['copy_egg_iaq_index'] = iter_data.index
-                    # data = data.merge(iter_data[cols_to_use], left_on="gps_sec", right_on="gps_sec", how="right")#on="egg_iaq_index")
                     data = data.merge(iter_data[cols_to_use], left_on="gps_sec", right_on="gps_sec",
-                                      how="left")  # on="egg_iaq_index")
-                    # print("data-head before index reset", data.head(2))
-                    # print("data-columns before index reset", data.columns)
+                                      how="left")
                     data = data.rename(columns={'copy_egg_iaq_index': 'egg_iaq_index'}).set_index('egg_iaq_index')
-                    # print("data-head after iaq", data.head(2))
-                    # print("data-head before columns", data.columns.tolist())
-                    # data
-                    # data = data.set_index("egg_iaq_index")
-                    # data = data.set_index("gps_sec")
                 else:
-                    # print("data.index: ", data.index)
-                    # print("iter_data[cols_to_use].index: ", iter_data[cols_to_use].index)
-                    # data = data.merge(iter_data[cols_to_use], on="egg_iaq_index")
-
                     ##Needed only for last one but should do no harm to others, I hope
                     iter_data.index = pd.to_datetime(iter_data.index)
-
-                    # print("data-head before join", data.head(2))
-                    # print("cols_to_use: ", cols_to_use)
-                    # print("iter_data[cols_to_use].head(2): ", iter_data[cols_to_use].head(2))
-                    # print("Who are the indices?: ", data.index)
-                    # print("Who are the indices?: ", iter_data[cols_to_use].index)
-                    # data = data.join(iter_data[cols_to_use], how='left')
                     data = data.join(iter_data[cols_to_use], how='left')
-                    # print("data-head after join", data.head(2))
-                # print("data-head", data.head(2))
 
             logger.info(f"Current data shape: {data.shape}")
             logger.info(f"\n---\n")

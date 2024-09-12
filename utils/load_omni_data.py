@@ -1,5 +1,9 @@
-import requests
+import logging
 from datetime import datetime
+
+import requests
+
+logger = logging.getLogger(__name__)
 
 def get_output_filename(year, data_spec="hourly"):
     if data_spec == "hourly":
@@ -10,6 +14,7 @@ def get_output_filename(year, data_spec="hourly"):
         raise ValueError("data_spec must be 'hourly' or 'minute'")
     return outfile
 
+# TODO: Why this does not use outdir here? Where is the file written to?
 def fetch_omni_data(year, outdir, data_spec="hourly"):
     """
     Fetches OMNI data for a given year.
@@ -20,22 +25,20 @@ def fetch_omni_data(year, outdir, data_spec="hourly"):
     Returns:
     None
     """
-    print(year)
+    logger.debug(f"year: {year}")
 
     url = "https://omniweb.gsfc.nasa.gov/cgi/nx1.cgi"
     startday = "0101"
 
     if datetime.now().year == int(year):
         endday = datetime.now().strftime("%m%d")
-        print(endday)
+        logger.debug(f"endday: {endday}")
     else:
         endday = "1231"
 
     startdate = f"{year}{startday}"
     enddate = f"{year}{endday}"
-
-    print(f"{startdate} to {enddate}")
-
+    logger.debug(f"{startdate} to {enddate}")
 
     params = {
         'activity': 'retrieve',
@@ -64,30 +67,14 @@ def fetch_omni_data(year, outdir, data_spec="hourly"):
 
     outfile = get_output_filename(year, data_spec)
 
-
-
     response = requests.get(url, params=params, allow_redirects=True)
-    #response = requests.post(url, params=params, allow_redirects=True, headers=headers)
-    print("response.request: ", response.request)
-    print("response.request.headers: ", response.request.headers)
-    print("response.request.body: ", response.request.body)
-    print("response.request.url: ", response.request.url)
-    print("response.request.method: ", response.request.method)
-    print("response: ", response)
-    #print("response.text: ", response.text)
-    print("response.content: ", response.content)
-    print("response.headers: ", response.headers)
-
-
-
-
-
     if response.status_code == 200:
         with open(outfile, "w") as f:
             f.write(response.text)
     else:
-        print("Failed to retrieve data")
-        return
+        # Throw exception if request fails
+        logger.error(f"Failed to retrieve omni data for year {year} with status code {response.status_code}")
+        raise Exception(f"Failed to retrieve omni data for year {year} with status code {response.status_code}")
 
     with open(outfile, "r") as f:
         lines = f.readlines()
@@ -95,12 +82,7 @@ def fetch_omni_data(year, outdir, data_spec="hourly"):
     # Remove HTML tagged lines, empty lines, parameter lines, and header line
     cleaned_lines = [
         line for line in lines if line.startswith(year)
-        #if not (line.strip().startswith("<") or line.strip() == "" or "YEAR" in line)
     ]
 
     with open(outfile, "w") as f:
         f.writelines(cleaned_lines)
-
-
-# Example usage:
-#fetch_omni_data("2021", "omnidata")  # Or fetch_omni_data("2021") for the whole year
