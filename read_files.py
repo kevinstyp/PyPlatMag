@@ -123,6 +123,8 @@ for year_month_specifier in config.year_month_specifiers:
     # TODO: To be honest, this should go to the training: Weightings are only needed for training (if wanted)
     data = data_enricher.add_weights(data)
 
+    # Add DOY
+    data['DOY'] = data["RAW_Timestamp"].dt.day_of_year
 
     # Write data to disk
     data_io.save_df(data, config.write_path, config.satellite_specifier, year_month_specifier, dataset_name="data")

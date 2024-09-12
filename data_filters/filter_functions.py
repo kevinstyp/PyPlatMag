@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 def filter_flag(data, flag):
     data = data.reset_index(drop=True)
     logger.debug(f"Filtering data with flag {flag}")
-    logger.debug(f"data with flag >= 1: {data[flag] >= 1}")
+    logger.info(f"Found {np.sum(data[flag] >= 1)} samples with {flag} Flag.")
     logger.debug(f"Timestamps of this data: {data.index.where(data[flag] >= 1)}")
 
     #data = data.drop((data[flag] >= 1).index, axis='index')
@@ -17,55 +17,20 @@ def filter_flag(data, flag):
     logger.info(f"Data shape after filtering for {flag} flag: {data.shape}")
     return data
 
-# TODO: Deprecated, should be removed
-def filter_flag_xyz(x_all, y_all, z_all, flag):
-    x_all = x_all.reset_index(drop=True)
-    y_all = y_all.reset_index(drop=True)
-    z_all = z_all.reset_index(drop=True)
-    #indices = z_all[flag].eq(0)
-    #indices = z_all[flag].eq(1)
-    print("z_all[flag] >= 1: ", z_all[flag] >= 1)
-    print("z_all.index[z_all[flag] >= 1]: ", z_all.index.where(z_all[flag] >= 1))
-    #print("z_all.index[z_all[flag] >= 1].tolist(): ", list(z_all.index.where(z_all[flag] >= 1)))
-
-    indices = z_all.index[z_all[flag] >= 1].tolist()
-    print("number of found samples with flag: ", len(indices), flag)
-    x_all = x_all.drop(indices, axis='index')#x_all.loc[indices]
-    y_all = y_all.drop(indices, axis='index')#y_all.loc[indices]
-    z_all = z_all.drop(indices, axis='index')#z_all.loc[indices]
-    print("x_all.shape: ", x_all.shape)
-    print("z_all.shape: ", z_all.shape)
-    #print("z-indices: ", indices)
-    #print("indices[indices == False]: ", indices[indices == False])
-    #x_all.compute()
-
-    x_all = x_all.reset_index(drop=True)
-    y_all = y_all.reset_index(drop=True)
-    z_all = z_all.reset_index(drop=True)
-
-    #x_all.compute()
-
-    return (x_all, y_all, z_all)
-
 def flag_magnetic_activity(data, dst_period=3600):
-    print("data bef KP-Dst Filtering: ", data.shape)
-    # le = Lower-equals = "<="
-    # gt = greater-than gets a 1-Flag
-    #z_all['KP_Dst_Flag'] = 0
+    logger.info(f"Data before first filtering: {data.shape}")
     data['Magnetic_Activity_Flag'] = 0
 
+    # le = Lower-equals = "<=", gt = greater-than gets a 1-Flag
     indices = data["Hp30"].gt(2.)
     data.loc[indices, 'Magnetic_Activity_Flag'] = 1
     # Count KP_Dst_Flag in z_all
-    print("data[Magnetic_Activity_Flag].sum() after KP-Filtering: ", data["Magnetic_Activity_Flag"].sum())
+    logger.info(f"Number of samples identified for Hp30 filtering: {data['Magnetic_Activity_Flag'].sum()}")
 
     # Compare Dst with an hour before
     indices = data["Dst"].diff(periods=dst_period).fillna(0).abs().gt(4)
-    print("indices.sum() after new Dst-Filtering: ", indices.sum())
     data.loc[indices, 'Magnetic_Activity_Flag'] = 1
-    print("data[Magnetic_Activity_Flag].sum() after new Dst-Filtering: ", data["Magnetic_Activity_Flag"].sum())
-
-    #print("x_all aft KP-Dst Filtering: ", x_all.shape)
+    logger.info(f"Number of samples identified for Dst change filtering: {data['Magnetic_Activity_Flag'].sum()}")
     return data
 
 

@@ -57,12 +57,13 @@ essential_calibration_keys: [ 'q1', 'q2', 'q3', 'q4', 'MHT00000', 'PHD94001', 'P
 ]
 
 train_config:
+  use_pinn: True
   use_amps: True
   filter_std: True
   filter_correlation: True
   training_file_path: 'config_goce/'
   test_split: 0.2
-  neural_network_variant: 3
+  neural_network_variant: 3 #0
   learn_config:
     epochs: 100
     batch_size: 1500

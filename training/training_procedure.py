@@ -15,8 +15,6 @@ def decompose_dataframe(df):
     z_all_features = config_goce.z_all_feature_keys
     y_all = df[y_all_features]
     z_all = df[z_all_features]
-    print("z_all: ", z_all.shape)
-    print("z_all: ", z_all.columns)
     x_all = df.drop(z_all_features, axis=1).drop(y_all_features, axis=1)
 
     return (x_all, y_all, z_all)
@@ -65,9 +63,19 @@ def extract_electric_currents(df, current_parameters_file, goce_column_descripti
 
     return df, electric_current_df
 
+def add_solar_activity(x_all, z_all):
+    x_all["F10.7"] = z_all["F10.7"]
+    x_all["F10.7-81d"] = z_all["F10.7-81d"]
+    return x_all
+
+def add_day_of_year(x_all, z_all):
+    x_all["DOY"] = z_all["DOY"]
+    return x_all
+
 def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
     year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
     std_file = training_file_path + year_months + "/std_column_indices.pkl"
+    logger.info(f"std_file: {std_file}")
 
     # # TODO: What was columns used for here?
     # columns = []
@@ -79,13 +87,14 @@ def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
 
     # Check if the file exists and if use_cache is True
     if use_cache and os.path.exists(std_file):
+        logger.info("Loading std_indices from file.")
         with open(std_file, 'rb') as f:
             std_indices = pickle.load(f)
     else:
         #std_indices = np.where(np.std(x_all, axis=0) != 0)
         # Get std_indices with pandas
-        std_indices = (x_all.std(axis=0) != 0).index
-        logger.debug(f"std_indices: {std_indices}")
+        std_indices = (x_all.std(axis=0) != 0.)
+        std_indices = std_indices[std_indices].index
         if not os.path.exists(std_file):
             os.makedirs(os.path.dirname(std_file), exist_ok=True)
         with open(std_file, 'wb') as f:
@@ -93,6 +102,8 @@ def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
 
     logger.debug(f"x_all: {x_all}")
     logger.debug(f"x_all.shape: {x_all.shape}")
+    logger.debug(f"std_indices: {std_indices}")
+    logger.debug(f"std_indices.shape: {std_indices.shape}")
 
     return x_all[std_indices]
 
@@ -116,7 +127,7 @@ def filter_correlation(x_all, training_file_path, year_month_specifiers, use_cac
         # and roughly computer precision (this is needed because of how the correlation is internally computed)
         corr_indices = [column for column in upper_tri.columns if
                         any(upper_tri[column] >= 1.0 - (10 * np.finfo(np.float32).eps))]
-        print("corr_indices: ", corr_indices)
+        logger.debug(f"corr_indices: {corr_indices}")
 
         if not os.path.exists(corr_file):
             os.makedirs(os.path.dirname(corr_file), exist_ok=True)
@@ -152,18 +163,29 @@ def split_train_test(arrays, test_split, batch_size):
     #TODO: Test this through: Is it really necessary to limit ourselves by the batch_size because of the custom implementation
     # of the layers?
     split_arrays = train_test_split(*arrays, test_size=test_split)
-    print("split_arrays:", split_arrays)
-    print("type split_arrays: ", type(split_arrays))
     max_size_train = split_arrays[0].shape[0] - split_arrays[0].shape[0] % batch_size
     max_size_test = split_arrays[1].shape[0] - split_arrays[1].shape[0] % batch_size
-    print("max_size_train:" , max_size_train)
-    print("max_size_test:" , max_size_test)
 
-    # Limit every second array in split_arrays by max_size
+    # Limit every second or other second array in split_arrays by max_size_train or max_size_test
     split_arrays = [
         arr[:max_size_train] if i % 2 == 0 else arr[:max_size_test]
         for i, arr in enumerate(split_arrays)
     ]
-    print("split_arrays:", split_arrays)
-    print("type split_arrays: ", type(split_arrays))
     return split_arrays
+
+def rebalance_weightings(weightings):
+    # Weightings sample size
+    s1 = weightings[weightings == 2].shape[0] # low latitudes
+    s2 = weightings[weightings == 1.5].shape[0] # mid latitudes
+    s3 = weightings[weightings == 1].shape[0] # high latitudes
+    logger.info(f"weightings, analysis for latitudes: low ({s1}), mid({s2}), high({s3})")
+    ratio_w2 = 1 / 4
+    ratio_w3 = 1 / 160
+    w1 = (s1 + s2 + s3) / (s1 + s2 * ratio_w2 + s3 * ratio_w3)
+    w2 = w1 * ratio_w2
+    w3 = w1 * ratio_w3
+    weightings[weightings == 2] = w1
+    weightings[weightings == 1.5] = w2
+    weightings[weightings == 1] = w3
+    logger.info(f"Calculated rebalanced weightings: low ({w1}), mid({w2}), high({w3})")
+    return weightings

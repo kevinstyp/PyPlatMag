@@ -32,66 +32,81 @@ data = goce_filter(data, magnetic_activity=True, doy=True, training=True, traini
 # Save exact amount of preprocessed columns for later reusage as pickle file
 
 # extract the currents & voltages for pinn before scaling is applied
-data, electric_current_df = extract_electric_currents(data, config_goce.current_parameters_file, config_goce.goce_column_description_file)
+train_config = config_goce.train_config
+if train_config.use_pinn:
+    data, electric_current_df = extract_electric_currents(data, config_goce.current_parameters_file, config_goce.goce_column_description_file)
+    # TODO Change back to above line
+    # electric_current_df = data[["PHT12780", "PHT12800"]]
+    # data = data.drop(["PHT12780", "PHT12800"], axis=1)
 
 # TODO: Why not use decompose_dataframe() function?
 # TODO: Is the modulo from the preprocess_data_array.py still needed?
 # TODO: Decompose is the much better name, split sounds like train / test which does not happen here
 x_all, y_all, z_all, weightings = training_data.split_dataframe(data, config_goce.y_all_feature_keys, config_goce.meta_features)
 
-# TODO: What about AMPS inclusion: Add CHAOS with AMPS model
+# weightings: Rebalance for sample sizes of the different regions (low, mid, and high latitudes)
+weightings = training_procedure.rebalance_weightings(weightings)
 
+# TODO: What about AMPS inclusion: Add CHAOS and AMPS model
+if train_config.use_amps:
+    logger.info(f"Using AMPS model for training")
+    y_all = y_all + z_all[['amps_b_mag_x', 'amps_b_mag_y', 'amps_b_mag_z']].values
+
+# Add solar activity, and DOY
+x_all = training_procedure.add_solar_activity(x_all, z_all)
+x_all = training_procedure.add_day_of_year(x_all, z_all)
+
+del z_all
 
 logger.info(f"x_all - columns assigned after split: {x_all.columns.tolist()}")
 
-train_config = config_goce.train_config
 
 # TODO: What about "second_preprocess": STD filtering, Correlation filtering, only needed for x_all data as only columns will be filtered
 if train_config.filter_std:
     x_all = training_procedure.filter_std(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
-
-print("x_all.shape: ", x_all.shape)
+    logger.debug(f"x_all - shape after std filtering: {x_all.shape}")
 
 if train_config.filter_correlation:
     x_all = training_procedure.filter_correlation(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
-
-print("x_all.shape: ", x_all.shape)
+    logger.debug(f"x_all - shape after correlation filtering: {x_all.shape}")
 
 x_all = training_procedure.scale_data(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
 
-print("x_all: ", x_all)
-print("x_all: ", x_all.shape)
-print("x_all - columns: ", x_all.columns.tolist())
+logger.info(f"x_all - shape before splitting: {x_all.shape}")
+logger.info(f"Final columns for training: {x_all.columns.tolist()}")
 
-# Now for train / test split
-x_train, x_test, y_train, y_test, el_cu_train, el_cu_test, weightings_train, weightings_test\
-    = training_procedure.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split, train_config.learn_config.batch_size)
+# Split the different parts in train / test
+if train_config.use_pinn:
+    x_train, x_test, y_train, y_test, el_cu_train, el_cu_test, weightings_train, weightings_test = \
+        training_procedure.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split, train_config.learn_config.batch_size)
+    logger.debug(f"el_cu_train - shape after splitting: {el_cu_train.shape}")
+else:
+    x_train, x_test, y_train, y_test, weightings_train, weightings_test = \
+        training_procedure.split_train_test([x_all, y_all, weightings], train_config.test_split, train_config.learn_config.batch_size)
+logger.info(f"x_train - shape after splitting: {x_train.shape}")
+logger.info(f"x_test - shape after splitting: {x_test.shape}")
 
-print("x_train.shape: ", x_train.shape)
-print("el_cu_train.shape: ", el_cu_train.shape)
-print("type of x_train: ", type(x_train))
-print("type of el_cu_train: ", type(el_cu_train))
-# # Convert every column of el_cu_train to a list and store in a list
-# el_cu_train = [el_cu_train[col].tolist() for col in el_cu_train.columns]
-# el_cu_test = [el_cu_test[col].tolist() for col in el_cu_test.columns]
-# model_input_train = [x_train] + el_cu_train
-# model_input_test = [x_test] + el_cu_test
-#print("overall model input shape: ", model_input_train[0].shape[1])
-model_input_train = pd.concat([x_train, el_cu_train], axis=1)
-model_input_test = pd.concat([x_test, el_cu_test], axis=1)
-print("model_input_train.shape: ", model_input_train.shape)
-print("model_input_test.shape: ", model_input_test.shape)
+if train_config.use_pinn:
+    model_input_train = pd.concat([x_train, el_cu_train], axis=1)
+    model_input_test = pd.concat([x_test, el_cu_test], axis=1)
+else:
+    model_input_train = x_train
+    model_input_test = x_test
+logger.info(f"model_input_train - shape after merging electric currents: {model_input_train.shape}")
 
-print("overall model input shape: ", model_input_train.shape)
-print("number_of_bisa_neurons: ", el_cu_train.shape)
-
-print("type of config_goce: ", type(config_goce))
-print("type of train_config.learn_config: ", type(train_config.learn_config))
-
-model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
+if train_config.use_pinn:
+    model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
                                         number_of_bisa_neurons=el_cu_train.shape[1],
                                         weightings_train=weightings_train,
                                    weightings_test=weightings_test,
                                     learn_config = train_config.learn_config,
                                     neural_net_variant=train_config.neural_network_variant,
                                         )
+else:
+    model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
+                                        weightings_train=weightings_train,
+                                   weightings_test=weightings_test,
+                                    learn_config = train_config.learn_config,
+                                    neural_net_variant=train_config.neural_network_variant,
+                                        )
+

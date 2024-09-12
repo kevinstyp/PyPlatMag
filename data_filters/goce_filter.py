@@ -14,7 +14,7 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
     data = ff.flag_magnetic_activity(data, dst_period=225)
 
     if magnetic_activity and training:
-        print("Applying Magnetic Activity-Filtering...")
+        logger.info(f"Applying Magnetic Activity-Filtering.")
         data = ff.filter_flag(data, "Magnetic_Activity_Flag")
     else:
         logger.warning("WARNING: No Magnetic-Activity-Filtering, but Flag added.")
@@ -59,14 +59,7 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
     # Filter out all columns starting with 'str', related to star trackers and thus positional encoding
     data = data.drop(list(data.filter(regex='^str.*')), axis=1, errors='ignore')
 
-    # TODO: These are data enrichments, not filtering (old code had solar_activity here as well)
-    # Add Day of Year
-    def add_day_of_year(data):
-        data["DOY"] = data["RAW_Timestamp"].dt.day_of_year
-        return data
-    data = add_day_of_year(data)
+    # TODO: Can be dropped, should be in read_files
+    data["DOY"] = data["RAW_Timestamp"].dt.day_of_year
 
-
-    #x_all, y_all, z_all = training_data.split_dataframe(data, y_features, meta_features)
-    #return (x_all, y_all, z_all)
     return data
