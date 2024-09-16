@@ -5,9 +5,9 @@ import pandas as pd
 import yaml
 from box import Box
 
-from training.training_procedure import extract_electric_currents
 from training import training_data
-from training import training_procedure
+from training import training_procedure as tp
+from training import evaluation_procedure as ep
 from data_filters.goce_filter import goce_filter
 from utils import data_io
 import training.neural_network_training as nn_train
@@ -24,8 +24,7 @@ logger.info(f"config_goce: {config_goce}")
 # Read dataframe for training
 data = data_io.read_df(config.write_path, config.satellite_specifier, config.year_month_specifiers, dataset_name="data_nonan")
 
-data = goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[], #satellite_specifier="GOCE",
-                #month_specifier="200912", euler_scaler=None,
+data = goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[],
             meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
 
 # TODO: is this still necessary, what was the reason for this?
@@ -34,7 +33,7 @@ data = goce_filter(data, magnetic_activity=True, doy=True, training=True, traini
 # extract the currents & voltages for pinn before scaling is applied
 train_config = config_goce.train_config
 if train_config.use_pinn:
-    data, electric_current_df = extract_electric_currents(data, config_goce.current_parameters_file, config_goce.goce_column_description_file)
+    data, electric_current_df = tp.extract_electric_currents(data, config_goce.current_parameters_file, config_goce.goce_column_description_file)
     # TODO Change back to above line
     # electric_current_df = data[["PHT12780", "PHT12800"]]
     # data = data.drop(["PHT12780", "PHT12800"], axis=1)
@@ -45,7 +44,7 @@ if train_config.use_pinn:
 x_all, y_all, z_all, weightings = training_data.split_dataframe(data, config_goce.y_all_feature_keys, config_goce.meta_features)
 
 # weightings: Rebalance for sample sizes of the different regions (low, mid, and high latitudes)
-weightings = training_procedure.rebalance_weightings(weightings)
+weightings = tp.rebalance_weightings(weightings)
 
 # TODO: What about AMPS inclusion: Add CHAOS and AMPS model
 if train_config.use_amps:
@@ -53,24 +52,23 @@ if train_config.use_amps:
     y_all = y_all + z_all[['amps_b_mag_x', 'amps_b_mag_y', 'amps_b_mag_z']].values
 
 # Add solar activity, and DOY
-x_all = training_procedure.add_solar_activity(x_all, z_all)
-x_all = training_procedure.add_day_of_year(x_all, z_all)
+x_all = tp.add_solar_activity(x_all, z_all)
+x_all = tp.add_day_of_year(x_all, z_all)
 
 del z_all
 
 logger.info(f"x_all - columns assigned after split: {x_all.columns.tolist()}")
 
 
-# TODO: What about "second_preprocess": STD filtering, Correlation filtering, only needed for x_all data as only columns will be filtered
 if train_config.filter_std:
-    x_all = training_procedure.filter_std(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
+    x_all = tp.filter_std(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
     logger.debug(f"x_all - shape after std filtering: {x_all.shape}")
 
 if train_config.filter_correlation:
-    x_all = training_procedure.filter_correlation(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
+    x_all = tp.filter_correlation(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
     logger.debug(f"x_all - shape after correlation filtering: {x_all.shape}")
 
-x_all = training_procedure.scale_data(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
+x_all = tp.scale_data(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
 
 logger.info(f"x_all - shape before splitting: {x_all.shape}")
 logger.info(f"Final columns for training: {x_all.columns.tolist()}")
@@ -78,11 +76,11 @@ logger.info(f"Final columns for training: {x_all.columns.tolist()}")
 # Split the different parts in train / test
 if train_config.use_pinn:
     x_train, x_test, y_train, y_test, el_cu_train, el_cu_test, weightings_train, weightings_test = \
-        training_procedure.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split, train_config.learn_config.batch_size)
+        tp.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split, train_config.learn_config.batch_size)
     logger.debug(f"el_cu_train - shape after splitting: {el_cu_train.shape}")
 else:
     x_train, x_test, y_train, y_test, weightings_train, weightings_test = \
-        training_procedure.split_train_test([x_all, y_all, weightings], train_config.test_split, train_config.learn_config.batch_size)
+        tp.split_train_test([x_all, y_all, weightings], train_config.test_split, train_config.learn_config.batch_size)
 logger.info(f"x_train - shape after splitting: {x_train.shape}")
 logger.info(f"x_test - shape after splitting: {x_test.shape}")
 
@@ -110,3 +108,10 @@ else:
                                     neural_net_variant=train_config.neural_network_variant,
                                         )
 
+year_months = '_'.join([config.year_month_specifiers[0], config.year_month_specifiers[-1]])
+model_name = config.model_output_path + config.model_name + '_' + config.satellite_specifier + '_' + year_months
+model.save(model_name + '.h5')
+
+# Evaluate the model on train and test data
+ep.evaluate_model(model_input_train, y_train, model_input_test, y_test, model, 'train', model_name, config.year_month_specifiers,
+                  train_config.learn_config)

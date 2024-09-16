@@ -1,2 +1,7 @@
-openpyxl
+numpy
+pyquaternion
+python-box
+tables
 pandas
+tensorflow
+openpyxl

@@ -1,9 +1,10 @@
 import tensorflow as tf
 
 # TODO: Go through all files in customs package and refactor them
+# TODO: mean is not utilized?
 class CustomInitializer(tf.keras.initializers.Initializer):
     def __init__(self, mean, number_of_biot_savart_neurons=1):
-        #self.mean = mean
+        self.mean = mean
         self.number_of_biot_savart_neurons = number_of_biot_savart_neurons
         self.number_of_biot_savart_outputs = tf.multiply(number_of_biot_savart_neurons, 3)
 
@@ -18,5 +19,7 @@ class CustomInitializer(tf.keras.initializers.Initializer):
             upper_part = tf.concat([upper_part, lower_part], axis=0)
 
         #result = tf.multiply(tf.eye(*shape, dtype=dtype), self.mean)
-        return upper_part
+        # Factor in self.mean
+        result = tf.multiply(upper_part, self.mean)
+        return result
 

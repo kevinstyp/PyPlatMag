@@ -71,16 +71,15 @@ class BiotSavartLayer(keras.layers.Layer):
             tf.print("m_times_r: ", m_times_r)
             tf.print("r_times_m_times_r: ", r_times_m_times_r)
 
-
-        ## calculate together:
+        # calculate together:
         inner_term = tf.divide(
-                        tf.scalar_mul(3, # 3 * ...
-                                r_times_m_times_r # r * (m * r)
+            tf.scalar_mul(3,  # 3 * ...
+                          r_times_m_times_r  # r * (m * r)
 
-                         ),
-                     scaling_5) # ... / r^5
+                          ),
+            scaling_5)  # ... / r^5
 
-        ## second momentum term: m / r^3
+        # second momentum term: m / r^3
         second_term = tf.divide(momentum, scaling_3)
         # Put it together: 100 * (inner_term - second_term)
         output = tf.scalar_mul(100., tf.subtract(inner_term, second_term))
