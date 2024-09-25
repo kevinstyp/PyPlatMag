@@ -2,6 +2,8 @@
 __pycache__/
 config_goce/
 data/
-*.log
+neuralnet/
+templates/**/*.cdf
 utils/*.lst
+*.log
 *.lst

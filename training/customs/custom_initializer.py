@@ -6,7 +6,24 @@ class CustomInitializer(tf.keras.initializers.Initializer):
     def __init__(self, mean, number_of_biot_savart_neurons=1):
         self.mean = mean
         self.number_of_biot_savart_neurons = number_of_biot_savart_neurons
-        self.number_of_biot_savart_outputs = tf.multiply(number_of_biot_savart_neurons, 3)
+        self.number_of_biot_savart_outputs = tf.multiply(number_of_biot_savart_neurons, 3).numpy()
+
+    # For the serialization of this custom Initializer
+    def get_config(self):
+        # config = {"output_dim": self.output_dim,
+        #           "units": self.units,
+        #           "init": self.init,
+        #           "verbose": self.verbose,
+        #           "metricname": self.metricname,
+        #           "alt_batch": self.alt_batch,
+        #           }
+        # base_config = super(BiotSavartLayer, self).get_config()
+        config = {"mean": self.mean,
+                    "number_of_biot_savart_neurons": self.number_of_biot_savart_neurons,
+                    #"number_of_biot_savart_outputs": self.number_of_biot_savart_outputs
+                  }
+        base_config = super(CustomInitializer, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
     def __call__(self, shape, dtype=None):
         # Must return a tensor of given shape

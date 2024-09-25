@@ -1,0 +1,530 @@
+
+! Skeleton table for the "template_platmag_meeting.cdf" CDF.
+! Generated: Monday, 4-Feb-2019 
+! CDF created/modified by CDF V3.6.0
+
+#header
+
+                       CDF NAME: template_aligncal_corr_v0301.cdf
+                  DATA ENCODING: NETWORK
+                       MAJORITY: ROW
+                         FORMAT: SINGLE
+
+! Variables  G.Attributes  V.Attributes  Records  Dims  Sizes
+! ---------  ------------  ------------  -------  ----  -----
+    0/21           9             2         0/z      0
+! CDF_COMPRESSION: None
+! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+! CDF_CHECKSUM: None
+! (Valid checksum: None, MD5)
+
+
+#GLOBALattributes
+
+! Attribute         Entry       Data
+! Name              Number      Type       Value
+! ---------         ------      ----       -----
+
+  "Project"             1:    CDF_CHAR     { "GOCE" } .
+  "TITLE"               1:    CDF_CHAR     { "GO_MAG_ACAL_CORR_ML_20000101" -
+                                             "GO_MAG_ACAL_CORR_ML_20000101" -
+                                             "01" } .
+  "ORIGINAL_PRODUCT_NAME"
+                        1:    CDF_CHAR     { "GO_MAG_ACAL_CORR_ML_20000101" -
+                                             "GO_MAG_ACAL_CORR_ML_20000101" -
+                                             "01" } .
+  "CREATOR"             1:    CDF_CHAR     { "GFZ" } .
+  "Generated_by"        1:    CDF_CHAR     { "GFZ" } .
+  "Generation_date"     1:    CDF_CHAR     { "2019-01-01 00:00:00" } .
+  "TEXT"                1:    CDF_CHAR     { "Fluxgate magnetometer (FGM), aligned" -
+                                             ", vector-vector calibrated" -
+                                             " and corrected for satellite disturbances" } .
+  "Acknowledgement"     1:    CDF_CHAR     { "European Space Agency (ESA)" } .
+  "Rules_of_use"        1:    CDF_CHAR     { "The data/data products are provided 'as-is' without warranty of any kind" -
+                                             "either expressed or implied, including but not limited to the implied warranties" -
+                                             "of merchantability, correctness and fitness for a particular purpose." -
+                                             "The entire risk as to the quality and performance" -
+                                             "of the Data/data products is with the Licensee." -
+                                             "In no event will GFZ be liable for any damages direct, indirect, incidental," -
+                                             "or consequential, including damages for any lost profits, lost savings, or other" -
+                                             "incidental or consequential damages arising out of the use or inability to use the" -
+                                             "data/data products." } .
+
+#VARIABLEattributes
+
+  "CATDESC"
+  "DEPEND_0"
+  "DEPEND_1"
+  "DICT_KEY"
+  "DISPLAY_TYPE"
+  "FIELDNAM"
+  "FILLVAL"
+  "FORMAT"
+  "LABLAXIS"
+  "UNITS"
+  "VALIDMIN"
+  "VALIDMAX"
+  "VAR_TYPE"
+  "SCALETYP"
+  "DEPEND_TIME"
+  "TIME_BASE"
+
+
+#variables
+
+! No rVariables.
+
+
+#zVariables
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "Timestamp"     CDF_EPOCH      1       0              T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: 01-Jan-0000 00:00:00.000
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "Timestamp" }
+    "TIME_BASE"   CDF_CHAR     { "0AD" }
+    "FIELDNAM"    CDF_CHAR     { "Timestamp" }
+    "FILLVAL"     CDF_EPOCH    { 31-Dec-9999 23:59:59.999 }
+    "LABLAXIS"    CDF_CHAR     { "UT" }
+    "UNITS"       CDF_CHAR     { "ms" }
+    "VALIDMIN"    CDF_EPOCH    { 01-Jan-2001 00:00:00.000 }
+    "VALIDMAX"    CDF_EPOCH    { 31-Dec-2100 23:59:59.999 }
+    "VAR_TYPE"    CDF_CHAR     { "support_data" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "Latitude"      CDF_DOUBLE     1       0              T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Position in ITRF - Latitude" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[deg] Position in ITRF - Latitude" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "deg" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "Longitude"     CDF_DOUBLE     1       0              T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Position in ITRF - Longitude" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[deg] Position in ITRF - Longitude" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "deg" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "Radius"        CDF_DOUBLE     1       0              T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Position in ITRF - Radius" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[m] Position in ITRF - Radius" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "m" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "QDLatitude"      CDF_DOUBLE     1       0              T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Quasi-Dipole Latitude" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[deg] Quasi-Dipole Latitude" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "deg" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "QDLongitude"     CDF_DOUBLE     1       0              T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Quasi-Dipole Longitude" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[deg] Quasi-Dipole Longitude" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "deg" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_MAG"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Fluxgate magnetometer, combined FGM," -
+                                  " aligned, vector-vector calibrated" -
+                                  " and corrected for satellite disturbances," -
+                                  " SC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_B" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] Fluxgate magnetometer, combined FGM," -
+                                  " aligned, vector-vector calibrated" -
+                                  " and corrected for satellite disturbances, SC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_NEC"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Fluxgate magnetometer, combined FGM," -
+                                  " aligned, vector-vector calibrated" -
+                                  " and corrected for satellite disturbances, NEC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_BNEC" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] Fluxgate magnetometer, combined FGM," -
+                                  " aligned, vector-vector calibrated" -
+                                  " and corrected for satellite disturbances, NEC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_FLAG"        CDF_UINT4     1       0              T
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: 0
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Flag for FGM" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "Flag for combined FGM (Bit field:" -
+								  "0: Data correct," -
+								  "1: Outlier detected," -
+								  "2: FGM interpolation corrupted)" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { " " }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "MAGNETIC_ACTIVITY_FLAG"        CDF_UINT4     1       0              T
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: 0
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Flag for filtered geomagnetic active values" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "Flag for filtered values using Hp30 and Dst indices (" -
+								  "0: Geomagnetic quiet," -
+								  "1: Geomagnetic active: Hp30 > 2 or |Dst| > 30)"}
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { " " }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "NaN_FLAG"        CDF_UINT4     1       0              T
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: 0
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Flag for filled NaN values" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "Flag for filled NaN values with column mean value (" -
+								  "0: Data complete," -
+								  "1: NaN values filled)"}
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { " " }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "q_FGM_NEC"     CDF_DOUBLE     1       1     4        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Quaternion, transformation: combined FGM ... NEC" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_Q" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "Quaternion, transformation: combined FGM ... NEC" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { " " }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+!----------------------------------------------------------------------
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "LABELS_B"     CDF_CHAR      5       1     3        F         T
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "LABELS_B" }
+    "DICT_KEY"    CDF_CHAR     { "label" }
+    "FIELDNAM"    CDF_CHAR     { "LABELS_B" }
+    "FORMAT"      CDF_CHAR     { "A2" }
+    "VAR_TYPE"    CDF_CHAR     { "metadata" } .
+
+  ! NRV values follow...
+
+    [1] = { "Bx" }
+    [2] = { "By" }
+    [3] = { "Bz" }
+
+
+!----------------------------------------------------------------------
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "LABELS_BNEC"     CDF_CHAR      8       1     3        F         T
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "LABELS_BNEC" }
+    "DICT_KEY"    CDF_CHAR     { "label" }
+    "FIELDNAM"    CDF_CHAR     { "LABELS_BNEC" }
+    "FORMAT"      CDF_CHAR     { "A8" }
+    "VAR_TYPE"    CDF_CHAR     { "metadata" } .
+
+  ! NRV values follow...
+
+    [1] = { "Bnorth" }
+    [2] = { "Beast" }
+    [3] = { "Bcentre" }
+
+
+!----------------------------------------------------------------------
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "LABELS_Q"     CDF_CHAR      5       1     4        F         T
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "LABELS_Q" }
+    "DICT_KEY"    CDF_CHAR     { "label" }
+    "FIELDNAM"    CDF_CHAR     { "LABELS_Q" }
+    "FORMAT"      CDF_CHAR     { "A2" }
+    "VAR_TYPE"    CDF_CHAR     { "metadata" } .
+
+  ! NRV values follow...
+
+    [1] = { "q1" }
+    [2] = { "q2" }
+    [3] = { "q3" }
+    [4] = { "q4" }
+
+
+
+#end

@@ -7,6 +7,7 @@ import ppigrf.ppigrf
 import pyamps
 from pyquaternion import Quaternion
 from scipy import interpolate
+from utils import quaternion_util as qu
 
 import utils.time_handler as th
 from dipole import Dipole
@@ -156,14 +157,7 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     # in the opposite direction to the B_e, B_n, B_c components
     quat = np.column_stack([data[quaternion_columns[0]].values, data[quaternion_columns[1]].values,
                             data[quaternion_columns[2]].values, data[quaternion_columns[3]].values])
-    # rotation_matrices = mtq.m_quaternion2dcMatrix(mtq.m_inverseQuaternion(quat))
-    # amps_mag_old = np.empty_like(amps_nec)
-    # for i in range(amps_mag_old.shape[0]):
-    #     amps_mag_old[i] = np.dot(rotation_matrices[i], amps_nec[i])
-    # del rotation_matrices
-
-    my_quaternions_inversed = [Quaternion(w, x, y, z).inverse for x, y, z, w in quat]
-    amps_mag = np.array([q.rotate(vec) for q, vec in zip(my_quaternions_inversed, amps_nec)])
+    amps_mag = qu.rotate_nec2mag(quat, amps_nec)
 
     data["amps_b_mag_x"] = amps_mag[:, 0]
     data["amps_b_mag_y"] = amps_mag[:, 1]

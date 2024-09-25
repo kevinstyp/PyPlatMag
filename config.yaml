@@ -1,9 +1,9 @@
 satellite_specifier: 'GOCE'
 
-year_month_specifiers: ["201002"] # ["201001", "201002", "201003"] # ["200912"]
+year_month_specifiers: ["200912", "201001"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
 
 pandas_inplace: False
-log_level: 'INFO' # 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+log_level: 'DEBUG' # 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
 
 goce_data_path: /Volumes/Crucial X8/GOCE/rawdata/ # Previously base_path
 write_path: /Volumes/Crucial X8/satellite_intermediate3/

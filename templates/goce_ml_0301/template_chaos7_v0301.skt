@@ -1,0 +1,445 @@
+
+! Skeleton table for the "template_platmag_meeting.cdf" CDF.
+! Generated: Monday, 4-Feb-2019 
+! CDF created/modified by CDF V3.6.0
+
+#header
+
+                       CDF NAME: template_chaos7_v0301.cdf
+                  DATA ENCODING: NETWORK
+                       MAJORITY: ROW
+                         FORMAT: SINGLE
+
+! Variables  G.Attributes  V.Attributes  Records  Dims  Sizes
+! ---------  ------------  ------------  -------  ----  -----
+    0/8           3             2         0/z      0
+! CDF_COMPRESSION: None
+! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+! CDF_CHECKSUM: None
+! (Valid checksum: None, MD5)
+
+
+#GLOBALattributes
+
+! Attribute         Entry       Data
+! Name              Number      Type       Value
+! ---------         ------      ----       -----
+
+  "Project"             1:    CDF_CHAR     { "GOCE" } .
+  "TITLE"               1:    CDF_CHAR     { "GO_MODEL_CHAOS7_20000101" -
+                                             "GO_MODEL_CHAOS7_20000101" -
+                                             "01" } .
+  "ORIGINAL_PRODUCT_NAME"
+                        1:    CDF_CHAR     { "GO_MODEL_CHAOS7_20000101" -
+                                             "GO_MODEL_CHAOS7_20000101" -
+                                             "01" } .
+  "CREATOR"             1:    CDF_CHAR     { "GFZ" } .
+  "Generated_by"        1:    CDF_CHAR     { "GFZ" } .
+  "Generation_date"     1:    CDF_CHAR     { "2019-01-01 00:00:00" } .
+  "TEXT"                1:    CDF_CHAR     { "CHAOS7 magnetic field model" } .
+  "Acknowledgement"     1:    CDF_CHAR     { "European Space Agency (ESA)" } .
+  "Rules_of_use"        1:    CDF_CHAR     { "The data/data products are provided 'as-is' without warranty of any kind" -
+                                             "either expressed or implied, including but not limited to the implied warranties" -
+                                             "of merchantability, correctness and fitness for a particular purpose." -
+                                             "The entire risk as to the quality and performance" -
+                                             "of the Data/data products is with the Licensee." -
+                                             "In no event will GFZ be liable for any damages direct, indirect, incidental," -
+                                             "or consequential, including damages for any lost profits, lost savings, or other" -
+                                             "incidental or consequential damages arising out of the use or inability to use the" -
+                                             "data/data products." } .
+#VARIABLEattributes
+
+  "CATDESC"
+  "DEPEND_0"
+  "DEPEND_1"
+  "DICT_KEY"
+  "DISPLAY_TYPE"
+  "FIELDNAM"
+  "FILLVAL"
+  "FORMAT"
+  "LABLAXIS"
+  "UNITS"
+  "VALIDMIN"
+  "VALIDMAX"
+  "VAR_TYPE"
+  "SCALETYP"
+  "DEPEND_TIME"
+  "TIME_BASE"
+
+
+#variables
+
+! No rVariables.
+
+
+#zVariables
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "Timestamp"     CDF_EPOCH      1       0              T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: 01-Jan-0000 00:00:00.000
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "Timestamp" }
+    "TIME_BASE"   CDF_CHAR     { "0AD" }
+    "FIELDNAM"    CDF_CHAR     { "Timestamp" }
+    "FILLVAL"     CDF_EPOCH    { 31-Dec-9999 23:59:59.999 }
+    "LABLAXIS"    CDF_CHAR     { "UT" }
+    "UNITS"       CDF_CHAR     { "ms" }
+    "VALIDMIN"    CDF_EPOCH    { 01-Jan-2001 00:00:00.000 }
+    "VALIDMAX"    CDF_EPOCH    { 31-Dec-2100 23:59:59.999 }
+    "VAR_TYPE"    CDF_CHAR     { "support_data" } .
+
+  ! RV values were not requested.
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_MAG"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "CHAOS7 magnetic field model," -
+                                  " (core+lithoshpere+external)" -
+                                  " SC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_B" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] CHAOS7 magnetic field model," -
+                                  " (core+lithoshpere+external)" -
+                                  " SC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_NEC"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "CHAOS7 magnetic field model," -
+                                  " (core+lithoshpere+external)" -
+                                  " NEC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_BNEC" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] CHAOS7 magnetic field model," -
+                                  " (core+lithoshpere+external)" -
+                                  " NEC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_COR_NEC"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "CHAOS7 magnetic field model," -
+                                  " (core)" -
+                                  " NEC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_BNEC" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] CHAOS7 magnetic field model," -
+                                  " (core)" -
+                                  " NEC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_LIT_NEC"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "CHAOS7 magnetic field model," -
+                                  " (lithoshpere)" -
+                                  " NEC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_BNEC" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] CHAOS7 magnetic field model," -
+                                  " (lithoshpere)" -
+                                  " NEC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_EXT_NEC"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "CHAOS7 magnetic field model," -
+                                  " (cexternal)" -
+                                  " NEC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_BNEC" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] CHAOS7 magnetic field model," -
+                                  " (external)" -
+                                  " NEC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_AMPS_MAG"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Average Magnetic field and Polar current System model (AMPS)," -
+                                  " as magnetic vector" -
+                                  " SC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_AMPS_B" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "Average Magnetic field and Polar current System model (AMPS)," -
+                                  " as magnetic vector" -
+                                  " SC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "B_AMPS_NEC"         CDF_DOUBLE     1       1     3        T         T
+
+  ! VAR_COMPRESSION: GZIP.1
+  ! (Valid compression: None, GZIP.1-9, RLE.0, HUFF.0, AHUFF.0)
+  ! VAR_SPARSERECORDS: None
+  ! (Valid sparserecords: None, sRecords.PAD, sRecords.PREV)
+  ! VAR_BLOCKINGFACTOR: 21600
+  ! VAR_PADVALUE: -1.0e+30
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "FIELDNAM"     CDF_CHAR     { "Average Magnetic field and Polar current System model (AMPS)," -
+                                  " as magnetic vector" -
+                                  " NEC frame" }
+    "DEPEND_0"     CDF_CHAR     { "Timestamp" }
+    "DEPEND_1"     CDF_CHAR     { "LABELS_AMPS_BNEC" }
+    "DISPLAY_TYPE" CDF_CHAR     { "time_series" }
+    "CATDESC"      CDF_CHAR     { "[nT] Average Magnetic field and Polar current System model (AMPS)," -
+                                  " as magnetic vector" -
+                                  " NEC frame" }
+    "FILLVAL"      CDF_REAL8    { NaN }
+    "UNITS"        CDF_CHAR     { "nT" }
+    "VAR_TYPE"     CDF_CHAR     { "data" }
+    "SCALETYP"     CDF_CHAR     { " " }
+    "DEPEND_TIME"  CDF_CHAR     { "Timestamp" } .
+
+  ! RV values were not requested.
+
+
+!----------------------------------------------------------------------
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "LABELS_B"     CDF_CHAR      5       1     3        F         T
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "LABELS_B" }
+    "DICT_KEY"    CDF_CHAR     { "label" }
+    "FIELDNAM"    CDF_CHAR     { "LABELS_B" }
+    "FORMAT"      CDF_CHAR     { "A2" }
+    "VAR_TYPE"    CDF_CHAR     { "metadata" } .
+
+  ! NRV values follow...
+
+    [1] = { "Bx" }
+    [2] = { "By" }
+    [3] = { "Bz" }
+
+
+!----------------------------------------------------------------------
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "LABELS_BNEC"     CDF_CHAR      8       1     3        F         T
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "LABELS_BNEC" }
+    "DICT_KEY"    CDF_CHAR     { "label" }
+    "FIELDNAM"    CDF_CHAR     { "LABELS_BNEC" }
+    "FORMAT"      CDF_CHAR     { "A8" }
+    "VAR_TYPE"    CDF_CHAR     { "metadata" } .
+
+  ! NRV values follow...
+
+    [1] = { "Bnorth" }
+    [2] = { "Beast" }
+    [3] = { "Bcentre" }
+
+!----------------------------------------------------------------------
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "LABELS_AMPS_B"     CDF_CHAR      5       1     3        F         T
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "LABELS_AMPS_B" }
+    "DICT_KEY"    CDF_CHAR     { "label" }
+    "FIELDNAM"    CDF_CHAR     { "LABELS_AMPS_B" }
+    "FORMAT"      CDF_CHAR     { "A2" }
+    "VAR_TYPE"    CDF_CHAR     { "metadata" } .
+
+  ! NRV values follow...
+
+    [1] = { "Bx" }
+    [2] = { "By" }
+    [3] = { "Bz" }
+
+
+!----------------------------------------------------------------------
+! Variable          Data      Number                 Record   Dimension
+! Name              Type     Elements  Dims  Sizes  Variance  Variances
+! --------          ----     --------  ----  -----  --------  ---------
+
+  "LABELS_AMPS_BNEC"     CDF_CHAR      8       1     3        F         T
+
+  ! Attribute       Data
+  ! Name            Type       Value
+  ! --------        ----       -----
+
+    "CATDESC"     CDF_CHAR     { "LABELS_AMPS_BNEC" }
+    "DICT_KEY"    CDF_CHAR     { "label" }
+    "FIELDNAM"    CDF_CHAR     { "LABELS_AMPS_BNEC" }
+    "FORMAT"      CDF_CHAR     { "A8" }
+    "VAR_TYPE"    CDF_CHAR     { "metadata" } .
+
+  ! NRV values follow...
+
+    [1] = { "Bnorth" }
+    [2] = { "Beast" }
+    [3] = { "Bcentre" }
+
+
+#end

@@ -111,6 +111,7 @@ def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
 def filter_correlation(x_all, training_file_path, year_month_specifiers, use_cache):
     year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
     corr_file = training_file_path + year_months + "/corr_column_indices.pkl"
+    logger.debug(f"corr_file: {corr_file}")
     # if isinstance(x_all, pd.DataFrame):
     #     logger.info(f"Converted x_all to array")
     #     x_all = x_all.values

@@ -108,10 +108,20 @@ else:
                                     neural_net_variant=train_config.neural_network_variant,
                                         )
 
+import numpy as np
+for layer in model.layers:
+    print("layer.name: ", layer.name)
+    # print("layer.get_weights(): ", layer.get_weights())
+    if "biot_savart_layer_" in layer.name:
+        # TODO: Tweak this, so the Radii are ouput
+        print("layer.get_weights(): ", layer.get_weights())
+        print("Length: ", np.linalg.norm(layer.get_weights()[0]))
+
+
 year_months = '_'.join([config.year_month_specifiers[0], config.year_month_specifiers[-1]])
 model_name = config.model_output_path + config.model_name + '_' + config.satellite_specifier + '_' + year_months
 model.save(model_name + '.h5')
 
 # Evaluate the model on train and test data
 ep.evaluate_model(model_input_train, y_train, model_input_test, y_test, model, 'train', model_name, config.year_month_specifiers,
-                  train_config.learn_config)
+                  train_config.learn_config, number_of_bisa_neurons=el_cu_train.shape[1])

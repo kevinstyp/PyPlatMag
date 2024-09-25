@@ -37,6 +37,7 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
     #     logger.info(f"after non-training handling data.shape: {data.shape}")
 
     # TODO: All of this NaN Handling seems odd to me, maybe quickly implement it, then comment it out for testing
+    # TODO: This should be rewritten: If there are Nans, the Nan-Handling did not work properly -> Throw an error here
     logger.info(f"Columns containing NaNs: {data.drop(meta_features, axis=1, errors='ignore').columns[data.drop(meta_features, axis=1, errors='ignore').isna().any()]}")
     data = data.drop(data.drop(meta_features, axis=1, errors='ignore').index.difference(data.drop(meta_features, axis=1, errors='ignore').dropna(axis='index').index))
     logger.info(f"Data shape after dropping NaNs: {data.shape}")

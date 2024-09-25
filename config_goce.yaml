@@ -1,5 +1,29 @@
 current_parameters_file: config_goce/electric_current_parameters.h5
 goce_column_description_file: ./GOCE-TLM-packets-description.xlsx
+
+train_config:
+  use_pinn: True
+  use_amps: True
+  filter_std: True
+  filter_correlation: True
+  training_file_path: 'config_goce/'
+  test_split: 0.2
+  neural_network_variant: 3 #0
+  learn_config:
+    epochs: 100
+    batch_size: 1500
+    learning_rate: 0.01
+    optimizer: 'adam'
+    loss: 'mean_squared_error'
+    first_extra: 0 #50
+    drop_every: 90
+
+cdf_config:
+  cdf_path: '/Volumes/Crucial X8/'
+  cdf_template_path: './templates/goce_ml_'
+  version: '0301'
+  sat_suffix: 'GO'
+
 y_all_feature_keys: [ 'CHAOS_B_FGM1_0', 'CHAOS_B_FGM1_1', 'CHAOS_B_FGM1_2' ]
 meta_features: [ 'RAW_Timestamp', 'KP_Timestamp',
                       'APEX_QD_LAT', 'APEX_QD_LON', 'APEX_MLT', 'RAW_Longitude', 'RAW_Latitude',
@@ -56,19 +80,4 @@ essential_calibration_keys: [ 'q1', 'q2', 'q3', 'q4', 'MHT00000', 'PHD94001', 'P
                                   'q4_fgm32nec', 'lt', 'mjd2000', 'qdlat', 'qdlon', 'mlat', 'mlt',
 ]
 
-train_config:
-  use_pinn: True
-  use_amps: True
-  filter_std: True
-  filter_correlation: True
-  training_file_path: 'config_goce/'
-  test_split: 0.2
-  neural_network_variant: 3 #0
-  learn_config:
-    epochs: 100
-    batch_size: 1500
-    learning_rate: 0.01
-    optimizer: 'adam'
-    loss: 'mean_squared_error'
-    first_extra: 0 #50
-    drop_every: 90
+
