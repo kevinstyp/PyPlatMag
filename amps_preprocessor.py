@@ -10,7 +10,7 @@ from scipy import interpolate
 from utils import quaternion_util as qu
 
 import utils.time_handler as th
-from dipole import Dipole
+from lib.dipole import Dipole
 import utils.load_omni_data as omni_loader
 from os.path import isfile
 

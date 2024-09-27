@@ -19,7 +19,7 @@ train_config:
     drop_every: 90
 
 cdf_config:
-  cdf_path: '/Volumes/Crucial X8/'
+  cdf_path: '/home/styp/cdf_pyplatmag/'
   cdf_template_path: './templates/goce_ml_'
   version: '0301'
   sat_suffix: 'GO'

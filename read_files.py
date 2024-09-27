@@ -1,23 +1,24 @@
-import pandas as pd
-from box import Box
-import yaml
 import logging
-
-import time
+import os
 import sys
+import time
 
-# Read config file
-from data_connectors.goce_data_connector import GOCEConnector
-from one_hot_encoder import one_hot_encode
+import pandas as pd
+import yaml
+from box import Box
 
 import utils.time_handler as th
-from preprocessing import data_enricher
-
-from space_weather_preprocessor import enrich_df_with_hp_data, enrich_df_with_kp_data, unpack_hp30_file_to_df, unpack_kp_dst_file_to_df
 from amps_preprocessor import enrich_df_with_amps_data, enrich_df_with_amps_params_data, unpack_amps_params_file_to_df
+from data_connectors.goce_data_connector import GOCEConnector
+from one_hot_encoder import one_hot_encode
+from preprocessing import data_enricher
+from space_weather_preprocessor import enrich_df_with_hp_data, enrich_df_with_kp_data, unpack_hp30_file_to_df, \
+    unpack_kp_dst_file_to_df
 from utils import data_io
 
-config = Box.from_yaml(filename="./config.yaml", Loader=yaml.SafeLoader)
+# Read config file
+dirname = os.path.dirname(__file__)
+config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -53,16 +54,17 @@ for year_month_specifier in config.year_month_specifiers:
     # Read additional files for data enrichment
     start_overall = time.process_time()
 
-    sw_df = unpack_kp_dst_file_to_df(config.auxiliary_data_path, year_month_specifier, config.use_cache)
+    auxiliary_data_path = os.path.join(dirname, config.auxiliary_data_path)
+    sw_df = unpack_kp_dst_file_to_df(auxiliary_data_path, year_month_specifier, config.use_cache)
     # 1.1 sec
     logger.info("Time for unpacking Kp/Dst data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
     start_overall = time.process_time()
     # TODO: This is called amps_params, but actually they are space-weather parameters, why not import them all in one step?
-    amps_params_df = unpack_amps_params_file_to_df(config.auxiliary_data_path, year_month_specifier)  # Solar wind speed, Bx, By, F10.7
+    amps_params_df = unpack_amps_params_file_to_df(auxiliary_data_path, year_month_specifier)  # Solar wind speed, Bx, By, F10.7
     # 22.4 sec
     logger.info("Time for unpacking Amps Params data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
     start_overall = time.process_time()
-    hp30_df = unpack_hp30_file_to_df(config.auxiliary_data_path, year_month=year_month_specifier, use_cache=config.use_cache)
+    hp30_df = unpack_hp30_file_to_df(auxiliary_data_path, year_month=year_month_specifier, use_cache=config.use_cache)
     # 2.1 sec
     logger.info("Time for unpacking Hp30 data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
 
