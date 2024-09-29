@@ -15,8 +15,9 @@ from training import training_data, training_procedure as tp
 from utils import data_io, quaternion_util as qu
 from utils import cdf_util as cu
 
-config = Box.from_yaml(filename="./config.yaml", Loader=yaml.SafeLoader)
-config_goce = Box.from_yaml(filename="./config_goce.yaml", Loader=yaml.SafeLoader)
+dirname = os.path.dirname(__file__)
+config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
+config_goce = Box.from_yaml(filename=os.path.join(dirname, "./config_goce.yaml"), Loader=yaml.SafeLoader)
 
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
@@ -57,6 +58,8 @@ logger.info(f"Data shape after filtering: {data.shape}")
 # Extract power currents if use_pinn is set
 train_config = config_goce.train_config
 if train_config.use_pinn:
+    current_parameters_file = os.path.join(dirname, config.current_parameters_file)
+    goce_column_description_file = os.path.join(dirname, config_goce.goce_column_description_file)
     data, electric_current_df = tp.extract_electric_currents(data, config_goce.current_parameters_file,
                                                              config_goce.goce_column_description_file)
 
@@ -68,16 +71,17 @@ x_all, y_all, z_all, weightings = training_data.split_dataframe(data, config_goc
 x_all = tp.add_solar_activity(x_all, z_all)
 x_all = tp.add_day_of_year(x_all, z_all)
 
+training_file_path = os.path.join(dirname, train_config.training_file_path)
 # Std, Corr, Scaling
 if train_config.filter_std:
-    x_all = tp.filter_std(x_all, train_config.training_file_path, config.year_month_specifiers, use_cache=True)
+    x_all = tp.filter_std(x_all, training_file_path, config.year_month_specifiers, use_cache=True)
     logger.debug(f"x_all - shape after std filtering: {x_all.shape}")
 
 if train_config.filter_correlation:
-    x_all = tp.filter_correlation(x_all, train_config.training_file_path, config.year_month_specifiers, use_cache=True)
+    x_all = tp.filter_correlation(x_all, training_file_path, config.year_month_specifiers, use_cache=True)
     logger.debug(f"x_all - shape after correlation filtering: {x_all.shape}")
 
-x_all = tp.scale_data(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
+x_all = tp.scale_data(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
 
 logger.info(f"x_all - shape before splitting: {x_all.shape}")
 logger.info(f"Final columns for generating predictions: {x_all.columns.tolist()}")
@@ -167,6 +171,7 @@ print('mae NN - train: ', meanae)
 print('mse NN - train: ', meanse)
 print("std NN: ", std1)
 
+cdf_template_path = os.path.join(dirname, cdf_config.cdf_template_path)
 for act_date in sorted(unique_dates):
     sel = (all_dates == act_date)
     logger.info(f"{np.sum(sel)} samples for date {act_date}")
@@ -194,7 +199,7 @@ for act_date in sorted(unique_dates):
                 output['NaN_FLAG'] = nan_flag[sel]
                 output['MAGNETIC_ACTIVITY_FLAG'] = magnetic_activity_flag[sel]
                 name_part = '_MAG_ACAL_CORR_ML_'
-                master_cdf_path = cdf_config.cdf_template_path + cdf_config.version + '/template_aligncal_corr_v' + cdf_config.version + '.cdf'
+                master_cdf_path = cdf_template_path + cdf_config.version + '/template_aligncal_corr_v' + cdf_config.version + '.cdf'
 
             if conf_out_param == 'chaos':
                 output = {}
@@ -223,7 +228,7 @@ for act_date in sorted(unique_dates):
                     z_all['chaos7_b_ext_nec_x'].values[sel], z_all['chaos7_b_ext_nec_y'].values[sel],
                     z_all['chaos7_b_ext_nec_z'].values[sel]]
                 name_part = '_MODEL_CHAOS7_'
-                master_cdf_path = cdf_config.cdf_template_path + cdf_config.version + '/template_chaos7_v' + cdf_config.version + '.cdf'
+                master_cdf_path = cdf_template_path + cdf_config.version + '/template_chaos7_v' + cdf_config.version + '.cdf'
 
             # Now the writing itself
             str_start = timestamp_series[sel].min().floor('1s').strftime('%Y%m%dT%H%M%S')

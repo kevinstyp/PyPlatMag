@@ -8,8 +8,9 @@ from box import Box
 from preprocessing import nan_handler
 from utils import data_io
 
-config = Box.from_yaml(filename="./config.yaml", Loader=yaml.SafeLoader)
-config_goce = Box.from_yaml(filename="./config_goce.yaml", Loader=yaml.SafeLoader)
+dirname = os.path.dirname(__file__)
+config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
+config_goce = Box.from_yaml(filename=os.path.join(dirname, "./config_goce.yaml"), Loader=yaml.SafeLoader)
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ save_path = data_io.get_save_path(config.write_path, satellite)
 ### 1: Check availability of everything for nan_application
 if config.use_cache and os.path.exists(save_path + "features_to_drop.pickle"):
     # Apply them to all year_month_specifiers
-    nan_handler.nan_application(save_path, config.year_month_specifiers, satellite, meta_features=config_goce.meta_features)
+    nan_handler.nan_application(config.year_month_specifiers, save_path, satellite, meta_features=config_goce.meta_features)
 
 
 else:
@@ -51,10 +52,10 @@ else:
 
     else:
         # Determine, then merge, then apply
-        nan_handler.nan_determination(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
-        nan_handler.nan_determination_merge(config.year_month_specifiers, config.write_path, satellite, config.nan_share,
+        nan_handler.nan_determination(config.year_month_specifiers, save_path, satellite, meta_features=config_goce.meta_features)
+        nan_handler.nan_determination_merge(config.year_month_specifiers, save_path, satellite, config.nan_share,
                                             config_goce.essential_calibration_keys)
-        nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
+        nan_handler.nan_application(config.year_month_specifiers, save_path, satellite, meta_features=config_goce.meta_features)
 
     ### 3: Check availability / just apply of everything for nan_determination
     # TODO: Is there something missing here?

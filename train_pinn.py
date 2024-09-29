@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 
 import pandas as pd
@@ -12,9 +13,9 @@ from data_filters.goce_filter import goce_filter
 from utils import data_io
 import training.neural_network_training as nn_train
 
-config = Box.from_yaml(filename="./config.yaml", Loader=yaml.SafeLoader)
-config_goce = Box.from_yaml(filename="./config_goce.yaml", Loader=yaml.SafeLoader)
-
+dirname = os.path.dirname(__file__)
+config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
+config_goce = Box.from_yaml(filename=os.path.join(dirname, "./config_goce.yaml"), Loader=yaml.SafeLoader)
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -33,7 +34,9 @@ data = goce_filter(data, magnetic_activity=True, doy=True, training=True, traini
 # extract the currents & voltages for pinn before scaling is applied
 train_config = config_goce.train_config
 if train_config.use_pinn:
-    data, electric_current_df = tp.extract_electric_currents(data, config_goce.current_parameters_file, config_goce.goce_column_description_file)
+    current_parameters_file = os.path.join(dirname, config.current_parameters_file)
+    goce_column_description_file = os.path.join(dirname, config_goce.goce_column_description_file)
+    data, electric_current_df = tp.extract_electric_currents(data, current_parameters_file, goce_column_description_file)
     # TODO Change back to above line
     # electric_current_df = data[["PHT12780", "PHT12800"]]
     # data = data.drop(["PHT12780", "PHT12800"], axis=1)
@@ -59,16 +62,16 @@ del z_all
 
 logger.info(f"x_all - columns assigned after split: {x_all.columns.tolist()}")
 
-
+training_file_path = os.path.join(dirname, train_config.training_file_path)
 if train_config.filter_std:
-    x_all = tp.filter_std(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
+    x_all = tp.filter_std(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
     logger.debug(f"x_all - shape after std filtering: {x_all.shape}")
 
 if train_config.filter_correlation:
-    x_all = tp.filter_correlation(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
+    x_all = tp.filter_correlation(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
     logger.debug(f"x_all - shape after correlation filtering: {x_all.shape}")
 
-x_all = tp.scale_data(x_all, train_config.training_file_path, config.year_month_specifiers, config.use_cache)
+x_all = tp.scale_data(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
 
 logger.info(f"x_all - shape before splitting: {x_all.shape}")
 logger.info(f"Final columns for training: {x_all.columns.tolist()}")
