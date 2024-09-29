@@ -52,7 +52,7 @@ else:
 
     else:
         # Determine, then merge, then apply
-        nan_handler.nan_determination(config.year_month_specifiers, save_path, satellite, meta_features=config_goce.meta_features)
+        nan_handler.nan_determination(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
         nan_handler.nan_determination_merge(config.year_month_specifiers, save_path, satellite, config.nan_share,
                                             config_goce.essential_calibration_keys)
         nan_handler.nan_application(config.year_month_specifiers, save_path, satellite, meta_features=config_goce.meta_features)

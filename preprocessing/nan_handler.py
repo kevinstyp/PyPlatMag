@@ -1,7 +1,6 @@
 import logging
 import os
 import pickle
-import time
 
 import numpy as np
 import pandas as pd
@@ -10,8 +9,8 @@ from utils import data_io
 
 logger = logging.getLogger(__name__)
 
-def get_save_path(save_path, satellite_specifier):
-    return save_path + satellite_specifier + "/"
+# def get_save_path(save_path, satellite_specifier):
+#     return save_path + satellite_specifier + "/"
 
 def nan_application(year_month_specifiers_list, save_path, satellite_specifier, meta_features):
     full_read_path = save_path + satellite_specifier + "/"
@@ -48,7 +47,7 @@ def nan_determination_merge(year_month_specifiers_list, save_path, satellite_spe
     df_overall_list = []
     # Load monthly data for mean and count and add them up
     for year_month_specifier in year_month_specifiers_list:
-        monthly_path = get_save_path(save_path, satellite_specifier) + year_month_specifier + "/"
+        monthly_path = data_io.get_save_path(save_path, satellite_specifier) + year_month_specifier + "/"
         logger.debug(f"monthly_path: {monthly_path}")
         with open(monthly_path + "df_column_nancount.pickle", "rb") as f:
             df_column_nancount = pickle.load(f)
@@ -117,9 +116,9 @@ def nan_determination_merge(year_month_specifiers_list, save_path, satellite_spe
         pickle.dump(features_fillna_mean, f)
 
 
-def nan_determination(year_month_specifiers, save_path, satellite_specifier, meta_features=[]):
+def nan_determination(year_month_specifiers, write_path, satellite_specifier, meta_features=[]):
     for year_month_specifier in year_month_specifiers:
-        df = data_io.read_df(save_path, satellite_specifier, [year_month_specifier], dataset_name="data")
+        df = data_io.read_df(write_path, satellite_specifier, [year_month_specifier], dataset_name="data")
 
         # Remove meta features from df as they are not used for training and may contain NaNs
         df = df.drop(columns=meta_features, errors='ignore')
@@ -134,7 +133,7 @@ def nan_determination(year_month_specifiers, save_path, satellite_specifier, met
             df_column_nancount[c] = df[c].isna().sum()
             df_column_mean[c] = df[c].mean()
 
-        monthly_path = get_save_path(save_path, satellite_specifier) + year_month_specifier + "/"
+        monthly_path = data_io.get_save_path(write_path, satellite_specifier) + year_month_specifier + "/"
         if not os.path.exists(monthly_path):
             os.makedirs(monthly_path)
         with open(monthly_path + "df_column_nancount.pickle", "wb") as f:
