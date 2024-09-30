@@ -12,15 +12,15 @@ logger = logging.getLogger(__name__)
 # def get_save_path(save_path, satellite_specifier):
 #     return save_path + satellite_specifier + "/"
 
-def nan_application(year_month_specifiers_list, save_path, satellite_specifier, meta_features):
-    full_read_path = save_path + satellite_specifier + "/"
+def nan_application(year_month_specifiers_list, write_path, satellite_specifier, meta_features):
+    full_read_path = write_path + satellite_specifier + "/"
     with open(full_read_path + "features_to_drop.pickle", 'rb') as f:
         features_to_drop = pickle.load(f)
     with open(full_read_path + "features_fillna_mean.pickle", 'rb') as f:
         features_fillna_mean = pickle.load(f)
     for year_month_specifier in year_month_specifiers_list:  # Go through the big list
         logger.info(f"Current year_month: {year_month_specifier}")
-        df = data_io.read_df(save_path, satellite_specifier, [year_month_specifier], dataset_name="data")
+        df = data_io.read_df(write_path, satellite_specifier, [year_month_specifier], dataset_name="data")
 
         # features_to_drop
         df = df.drop(columns=features_to_drop, errors='ignore')
@@ -39,15 +39,15 @@ def nan_application(year_month_specifiers_list, save_path, satellite_specifier, 
         for col in missing_feats:
             df[col] = features_fillna_mean[col]
 
-        data_io.save_df(df, save_path, satellite_specifier, year_month_specifier, dataset_name="data_nonan")
+        data_io.save_df(df, write_path, satellite_specifier, year_month_specifier, dataset_name="data_nonan")
 
-def nan_determination_merge(year_month_specifiers_list, save_path, satellite_specifier, nan_share=0.2, essential_calibration_keys=[]):
+def nan_determination_merge(year_month_specifiers_list, write_path, satellite_specifier, nan_share=0.2, essential_calibration_keys=[]):
     df_column_nancount_list = []
     df_column_mean_list = []
     df_overall_list = []
     # Load monthly data for mean and count and add them up
     for year_month_specifier in year_month_specifiers_list:
-        monthly_path = data_io.get_save_path(save_path, satellite_specifier) + year_month_specifier + "/"
+        monthly_path = data_io.get_save_path(write_path, satellite_specifier) + year_month_specifier + "/"
         logger.debug(f"monthly_path: {monthly_path}")
         with open(monthly_path + "df_column_nancount.pickle", "rb") as f:
             df_column_nancount = pickle.load(f)
@@ -107,7 +107,7 @@ def nan_determination_merge(year_month_specifiers_list, save_path, satellite_spe
 
     features_fillna_mean = pd.Series(dict(zip(df_columns, partly_mean_list)))
 
-    full_write_path = save_path + satellite_specifier + "/"
+    full_write_path = write_path + satellite_specifier + "/"
     if not os.path.exists(full_write_path):
         os.makedirs(full_write_path)
     with open(full_write_path + "features_to_drop.pickle", 'wb') as f:

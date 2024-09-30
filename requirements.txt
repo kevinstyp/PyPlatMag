@@ -5,3 +5,4 @@ tables
 pandas
 tensorflow
 openpyxl
+scikit-learn
