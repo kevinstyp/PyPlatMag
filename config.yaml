@@ -26,4 +26,4 @@ string_conversion: 'one-hot' # or 'remove'
 
 nan_share: 0.2
 
-CDF-lib: "~/lib/"
+CDF_LIB: "~/lib/"

@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import yaml
 from box import Box
-from spacepy import pycdf
 
 import publication.training_retrieval as tr
 from data_filters.goce_filter import goce_filter
@@ -19,13 +18,15 @@ dirname = os.path.dirname(__file__)
 config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
 config_goce = Box.from_yaml(filename=os.path.join(dirname, "./config_goce.yaml"), Loader=yaml.SafeLoader)
 
+os.environ["CDF_LIB"] = config.CDF_LIB
+from spacepy import pycdf
+
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
 logger.info(f"config: {config}")
 logger.info(f"config_goce: {config_goce}")
 
-os.environ["CDF_LIB"] = "~/lib/"
 
 # Get the year_months used to save auxilary files
 if config.model_year_months == "None":
