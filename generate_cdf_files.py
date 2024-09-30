@@ -19,6 +19,7 @@ config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=y
 config_goce = Box.from_yaml(filename=os.path.join(dirname, "./config_goce.yaml"), Loader=yaml.SafeLoader)
 
 os.environ["CDF_LIB"] = config.CDF_LIB
+os.environ["CDF_BIN"] = config.CDF_BIN
 from spacepy import pycdf
 
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
@@ -36,7 +37,8 @@ else:
 
 # Load the auxilary files created during training
 train_config = config_goce.train_config
-std_indices, corr_indices, hk_scaler = tr.read_in_pickles_small(train_config.training_file_path, year_months)
+training_file_path = os.path.join(dirname, train_config.training_file_path)
+std_indices, corr_indices, hk_scaler = tr.read_in_pickles_small(training_file_path, year_months)
 
 # Specify the model to be loaded
 model_name = config.model_output_path + config.model_name + '_' + config.satellite_specifier + '_' + year_months + '.h5'
@@ -61,8 +63,8 @@ train_config = config_goce.train_config
 if train_config.use_pinn:
     current_parameters_file = os.path.join(dirname, config.current_parameters_file)
     goce_column_description_file = os.path.join(dirname, config_goce.goce_column_description_file)
-    data, electric_current_df = tp.extract_electric_currents(data, config_goce.current_parameters_file,
-                                                             config_goce.goce_column_description_file)
+    data, electric_current_df = tp.extract_electric_currents(data, current_parameters_file,
+                                                             goce_column_description_file)
 
 
 # TODO: training_data, training_prcedure -> Maybe, rename them to preprare_data, prepare_procedure or smth
@@ -72,7 +74,6 @@ x_all, y_all, z_all, weightings = training_data.split_dataframe(data, config_goc
 x_all = tp.add_solar_activity(x_all, z_all)
 x_all = tp.add_day_of_year(x_all, z_all)
 
-training_file_path = os.path.join(dirname, train_config.training_file_path)
 # Std, Corr, Scaling
 if train_config.filter_std:
     x_all = tp.filter_std(x_all, training_file_path, config.year_month_specifiers, use_cache=True)
