@@ -2,6 +2,7 @@
 from pyquaternion import Quaternion
 import numpy as np
 
+
 def rotate_mag2nec(quaternions_mag2nec, mag_data):
     """
     Rotate MAG data from MAG frame to NEC frame using quaternions.

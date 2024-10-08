@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # TODO: Rename function
 def read_in_pickles_small(training_file_path, year_months):
     print("training_file_path: ", training_file_path)

@@ -9,8 +9,6 @@ from utils import data_io
 
 logger = logging.getLogger(__name__)
 
-# def get_save_path(save_path, satellite_specifier):
-#     return save_path + satellite_specifier + "/"
 
 def nan_application(year_month_specifiers_list, write_path, satellite_specifier, meta_features):
     full_read_path = write_path + satellite_specifier + "/"
@@ -40,6 +38,7 @@ def nan_application(year_month_specifiers_list, write_path, satellite_specifier,
             df[col] = features_fillna_mean[col]
 
         data_io.save_df(df, write_path, satellite_specifier, year_month_specifier, dataset_name="data_nonan")
+
 
 def nan_determination_merge(year_month_specifiers_list, write_path, satellite_specifier, nan_share=0.2, essential_calibration_keys=[]):
     df_column_nancount_list = []

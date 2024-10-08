@@ -4,6 +4,7 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
+
 class StepDecay():
     def __init__(self, initAlpha=0.01, factor=0.25, dropEvery=10, first_extra=10):
         # store the base initial learning rate, drop factor, and

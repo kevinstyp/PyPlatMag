@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 
 logger = logging.getLogger(__name__)
 
+
 def decompose_dataframe(df):
     y_all_features = config_goce.y_all_feature_keys
     z_all_features = config_goce.z_all_feature_keys
@@ -18,6 +19,7 @@ def decompose_dataframe(df):
     x_all = df.drop(z_all_features, axis=1).drop(y_all_features, axis=1)
 
     return (x_all, y_all, z_all)
+
 
 def extract_electric_currents_parameter_file(current_parameters_file, goce_column_description_file):
     # read in csv into pandas
@@ -41,6 +43,7 @@ def extract_electric_currents_parameter_file(current_parameters_file, goce_colum
     with open(current_parameters_file, 'wb') as f:
         pickle.dump(current_parameters, f)
 
+
 def extract_electric_currents(df, current_parameters_file, goce_column_description_file):
     # Check for the existence of the current_parameters_file, otherwise call create method
     if not os.path.exists(current_parameters_file):
@@ -63,14 +66,17 @@ def extract_electric_currents(df, current_parameters_file, goce_column_descripti
 
     return df, electric_current_df
 
+
 def add_solar_activity(x_all, z_all):
     x_all["F10.7"] = z_all["F10.7"]
     x_all["F10.7-81d"] = z_all["F10.7-81d"]
     return x_all
 
+
 def add_day_of_year(x_all, z_all):
     x_all["DOY"] = z_all["DOY"]
     return x_all
+
 
 def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
     year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
@@ -91,8 +97,7 @@ def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
         with open(std_file, 'rb') as f:
             std_indices = pickle.load(f)
     else:
-        #std_indices = np.where(np.std(x_all, axis=0) != 0)
-        # Get std_indices with pandas
+        # Get std_indices
         std_indices = (x_all.std(axis=0) != 0.)
         std_indices = std_indices[std_indices].index
         if not os.path.exists(std_file):
@@ -112,9 +117,7 @@ def filter_correlation(x_all, training_file_path, year_month_specifiers, use_cac
     year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
     corr_file = training_file_path + year_months + "/corr_column_indices.pkl"
     logger.debug(f"corr_file: {corr_file}")
-    # if isinstance(x_all, pd.DataFrame):
-    #     logger.info(f"Converted x_all to array")
-    #     x_all = x_all.values
+
     # Check if the file exists and if use_cache is True
     if use_cache and os.path.exists(corr_file):
         with open(corr_file, 'rb') as f:
@@ -135,7 +138,6 @@ def filter_correlation(x_all, training_file_path, year_month_specifiers, use_cac
         with open(corr_file, 'wb') as f:
             pickle.dump(corr_indices, f)
 
-    #return np.delete(x_all, corr_indices, axis=1)
     return x_all.drop(columns=x_all.columns[corr_indices])
 
 
@@ -161,8 +163,8 @@ def scale_data(x_all, training_file_path, year_month_specifiers, use_cache):
 
 
 def split_train_test(arrays, test_split, batch_size):
-    #TODO: Test this through: Is it really necessary to limit ourselves by the batch_size because of the custom implementation
-    # of the layers?
+    # TODO: Test this through: Is it really necessary to limit ourselves by the batch_size because of the custom implementation
+    ## of the layers?
     split_arrays = train_test_split(*arrays, test_size=test_split)
     max_size_train = split_arrays[0].shape[0] - split_arrays[0].shape[0] % batch_size
     max_size_test = split_arrays[1].shape[0] - split_arrays[1].shape[0] % batch_size
@@ -174,11 +176,12 @@ def split_train_test(arrays, test_split, batch_size):
     ]
     return split_arrays
 
+
 def rebalance_weightings(weightings):
     # Weightings sample size
-    s1 = weightings[weightings == 2].shape[0] # low latitudes
-    s2 = weightings[weightings == 1.5].shape[0] # mid latitudes
-    s3 = weightings[weightings == 1].shape[0] # high latitudes
+    s1 = weightings[weightings == 2].shape[0]  # low latitudes
+    s2 = weightings[weightings == 1.5].shape[0]  # mid latitudes
+    s3 = weightings[weightings == 1].shape[0]  # high latitudes
     logger.info(f"weightings, analysis for latitudes: low ({s1}), mid({s2}), high({s3})")
     ratio_w2 = 1 / 4
     ratio_w3 = 1 / 160

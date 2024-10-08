@@ -26,7 +26,7 @@ logger.info(f"config_goce: {config_goce}")
 data = data_io.read_df(config.write_path, config.satellite_specifier, config.year_month_specifiers, dataset_name="data_nonan")
 
 data = goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[],
-            meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
+                   meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
 
 # TODO: is this still necessary, what was the reason for this?
 # Save exact amount of preprocessed columns for later reusage as pickle file
@@ -79,7 +79,8 @@ logger.info(f"Final columns for training: {x_all.columns.tolist()}")
 # Split the different parts in train / test
 if train_config.use_pinn:
     x_train, x_test, y_train, y_test, el_cu_train, el_cu_test, weightings_train, weightings_test = \
-        tp.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split, train_config.learn_config.batch_size)
+        tp.split_train_test([x_all, y_all, electric_current_df, weightings], train_config.test_split,
+                            train_config.learn_config.batch_size)
     logger.debug(f"el_cu_train - shape after splitting: {el_cu_train.shape}")
 else:
     x_train, x_test, y_train, y_test, weightings_train, weightings_test = \
@@ -97,29 +98,19 @@ logger.info(f"model_input_train - shape after merging electric currents: {model_
 
 if train_config.use_pinn:
     model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
-                                        number_of_bisa_neurons=el_cu_train.shape[1],
-                                        weightings_train=weightings_train,
-                                   weightings_test=weightings_test,
-                                    learn_config = train_config.learn_config,
-                                    neural_net_variant=train_config.neural_network_variant,
-                                        )
+                                            number_of_bisa_neurons=el_cu_train.shape[1],
+                                            weightings_train=weightings_train,
+                                            weightings_test=weightings_test,
+                                            learn_config=train_config.learn_config,
+                                            neural_net_variant=train_config.neural_network_variant,
+                                            )
 else:
     model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
-                                        weightings_train=weightings_train,
-                                   weightings_test=weightings_test,
-                                    learn_config = train_config.learn_config,
-                                    neural_net_variant=train_config.neural_network_variant,
-                                        )
-
-import numpy as np
-for layer in model.layers:
-    print("layer.name: ", layer.name)
-    # print("layer.get_weights(): ", layer.get_weights())
-    if "biot_savart_layer_" in layer.name:
-        # TODO: Tweak this, so the Radii are ouput
-        print("layer.get_weights(): ", layer.get_weights())
-        print("Length: ", np.linalg.norm(layer.get_weights()[0]))
-
+                                            weightings_train=weightings_train,
+                                            weightings_test=weightings_test,
+                                            learn_config=train_config.learn_config,
+                                            neural_net_variant=train_config.neural_network_variant,
+                                            )
 
 year_months = '_'.join([config.year_month_specifiers[0], config.year_month_specifiers[-1]])
 model_name = config.model_output_path + config.model_name + '_' + config.satellite_specifier + '_' + year_months

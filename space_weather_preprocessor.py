@@ -12,6 +12,7 @@ import utils.load_Hp30_data as hp30_loader
 
 logger = logging.getLogger(__name__)
 
+
 def unpack_kp_dst_file_to_df(auxiliary_data_path, year_month, use_cache=True):
 
     kp_dst_f107_path = omni_loader.get_output_filename(year=year_month[:4], data_spec="hourly")
@@ -64,6 +65,7 @@ def unpack_hp30_file_to_df(auxiliary_data_path, year_month, use_cache=True):
     logger.debug(f"hp30_df.head(10): {hp30_df.head(10)}")
     return hp30_df
 
+
 def enrich_df_with_kp_data(data, kp_df, with_kp=False):
     logger.debug(f"kp_df.head(5): {kp_df.head(5)}")
     logger.debug(f"data.shape: {data.shape}")
@@ -75,7 +77,7 @@ def enrich_df_with_kp_data(data, kp_df, with_kp=False):
     logger.info(f"Spaceweather Flag after Dst: {kp_df['Spaceweather_Flag'].sum()}")
     # TODO: This does not look too well here!?
     data = data.reset_index(drop=True)
-    data = pd.merge_asof(data, kp_df[["KP_Timestamp", "Spaceweather_Flag"]], on=None, left_on="RAW_Timestamp", right_on="KP_Timestamp",  #
+    data = pd.merge_asof(data, kp_df[["KP_Timestamp", "Spaceweather_Flag"]], on=None, left_on="RAW_Timestamp", right_on="KP_Timestamp",
                          left_index=False, right_index=False, by=None,
                          left_by=None, right_by=None, suffixes=('_x', '_y'), tolerance=pd.Timedelta("1h"),
                          allow_exact_matches=True,
@@ -84,7 +86,7 @@ def enrich_df_with_kp_data(data, kp_df, with_kp=False):
 
     if with_kp:
         #data = data.set_index("RAW_Timestamp", drop=False)
-        data = pd.merge_asof(data, kp_df[["KP_Timestamp", "KP"]], on=None, left_on="RAW_Timestamp", right_on="KP_Timestamp",  #
+        data = pd.merge_asof(data, kp_df[["KP_Timestamp", "KP"]], on=None, left_on="RAW_Timestamp", right_on="KP_Timestamp",
                                   left_index=False, right_index=False, by=None,
                                   left_by=None, right_by=None, suffixes=('_x', '_y'), tolerance=pd.Timedelta("1h"),
                                   allow_exact_matches=True,
@@ -95,10 +97,11 @@ def enrich_df_with_kp_data(data, kp_df, with_kp=False):
     logger.info(f"Spaceweather Flag after KP merge: {data['Spaceweather_Flag'].sum()}")
     return data
 
+
 def enrich_df_with_hp_data(data, hp30_df):
     logger.debug(f"hp30_df.head(5): {hp30_df.head(5)}")
     data = data.reset_index(drop=True)
-    data = pd.merge_asof(data, hp30_df[["HP_Timestamp", "Hp30"]], on=None, left_on="RAW_Timestamp", right_on="HP_Timestamp",  #
+    data = pd.merge_asof(data, hp30_df[["HP_Timestamp", "Hp30"]], on=None, left_on="RAW_Timestamp", right_on="HP_Timestamp",
                          left_index=False, right_index=False, by=None,
                          left_by=None, right_by=None, suffixes=('_x', '_y'), tolerance=pd.Timedelta("30min"),
                          allow_exact_matches=True,

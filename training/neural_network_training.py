@@ -8,6 +8,7 @@ from training.model_builder import build_network_goce, build_network_goce_pinn
 
 logger = logging.getLogger(__name__)
 
+
 def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings_test, learn_config=None, neural_net_variant=0,
                   model_path=None, all_values_raw=None,
                   all_values_tq=None, timestamps_training=None, timestamps_val=None, number_of_bisa_neurons=None):
@@ -17,16 +18,11 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
     epochs = learn_config.epochs
     batch_size = learn_config.batch_size
 
-
-    #tf.executing_eagerly()
-    ###os.environ["TF_KERAS"] = '1'
-
-
     if neural_net_variant == 0:
         model = build_network_goce(input_shape=(x_train.shape[1]))
 
     elif neural_net_variant == 1:
-        init_value = 1.0#1e-4
+        init_value = 1.0  # 1e-4
         model = build_interpolation_network_goce(batch_size,
                                                         all_values_raw, all_values_tq, #all_values_sa, all_values_bc,
                                                         hk_shape=(x_train.shape[1]),

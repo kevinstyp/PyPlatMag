@@ -27,8 +27,7 @@ logger.info(f"config: {config}")
 for year_month_specifier in config.year_month_specifiers:
     first_time = time.process_time()
 
-    ### GOCE Data-Connector
-    # Instantiate the GOCEConnector
+    # GOCE Data-Connector
     goce_connector = GOCEConnector(base_path=config.goce_data_path)
     # Get the data
     data = goce_connector.get_data(year_month_specifier)
@@ -37,7 +36,7 @@ for year_month_specifier in config.year_month_specifiers:
 
     if config.string_conversion == 'one-hot':
         data = one_hot_encode(data, config.pandas_inplace)
-    #elif config.string_conversion == 'remove':
+    # elif config.string_conversion == 'remove':
     else:
         pass
 
@@ -81,16 +80,14 @@ for year_month_specifier in config.year_month_specifiers:
     del amps_params_df, sw_df, hp30_df
 
     start_overall = time.process_time()
-    #TODO: Move this line to a better place?
-    # Removes NaN entries where positional arguments are missing (e.g., latitude and quaternions)
+    # TODO: Move this line to a better place?
+    #  Removes NaN entries where positional arguments are missing (e.g., latitude and quaternions)
     data = data[data['APEX_QD_LAT'].between(-90., 90.)]
     # TODO: It seems that quats are float32, whereas they were float64 before in the older code
     data = enrich_df_with_amps_data(data)
     logger.info("Time for enriching with AMPS data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
 
     data["F10.7-81d"] = data["F10.7"].rolling(window=1944, center=True, min_periods=1).mean()
-
-    # Line 444
 
     # TODO: Not consider features, Line 454
     do_not_consider_features = ['gps_sec', 'lt', 'mjd2000', 'mlat', 'chaos7_b_fgm2_x', 'chaos7_b_fgm2_y', 'chaos7_b_fgm2_z',
