@@ -8,8 +8,10 @@ from lib.get_Kp_index import getKpindex
 
 logger = logging.getLogger(__name__)
 
+
 def get_output_filename(year, outdir="./data/auxiliary_params/"):
     return f"{outdir}/hp30_{year}.h5"
+
 
 def fetch_Hp30_data(year, outdir="./data/auxiliary_params/"):
     logger.debug(f"year: {year}")

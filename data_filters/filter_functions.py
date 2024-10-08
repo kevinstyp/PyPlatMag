@@ -17,6 +17,7 @@ def filter_flag(data, flag):
     logger.info(f"Data shape after filtering for {flag} flag: {data.shape}")
     return data
 
+
 def flag_magnetic_activity(data, dst_period=3600):
     logger.info(f"Data before first filtering: {data.shape}")
     data['Magnetic_Activity_Flag'] = 0

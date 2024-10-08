@@ -8,7 +8,8 @@ from data_connectors.data_connector import Connector
 
 logger = logging.getLogger(__name__)
 
-#TODO: Clean up in this class, spend some code comments
+
+# TODO: Clean up in this class, spend some code comments
 class GOCEConnector(Connector):
     def __init__(self, base_path):
         self.data = None
@@ -82,7 +83,7 @@ class GOCEConnector(Connector):
             logger.info(f"Current data shape: {data.shape}")
             logger.info(f"\n---\n")
 
-        ### Renaming to my conventions
+        # Renaming to my conventions
         # 'qdlat' -> 'APEX_QD_LAT'
         # TODO: Why?? Isn't qdlat the much nicer name??
         data = data.rename(columns={"qdlat": "APEX_QD_LAT"})

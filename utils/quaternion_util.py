@@ -6,8 +6,8 @@ def rotate_mag2nec(quaternions_mag2nec, mag_data):
     """
     Rotate MAG data from MAG frame to NEC frame using quaternions.
     Args:
-        quaternions: Quaternions to rotate MAG data from MAG frame to NEC frame.
-        fgm_data: MAG data to rotate.
+        quaternions_mag2nec: Quaternions to rotate MAG data from MAG frame to NEC frame.
+        mag_data: MAG data to rotate.
     Returns:
         Rotated MAG data in NEC frame.
     """
@@ -25,7 +25,7 @@ def rotate_nec2mag(quaternions_fgm2nec, nec_data):
     """
     Rotate NEC data from NEC frame to MAG frame using quaternions.
     Args:
-        quaternions: Quaternions to rotate NEC data from NEC frame to MAG frame.
+        quaternions_fgm2nec: Quaternions to rotate NEC data from NEC frame to MAG frame.
         nec_data: NEC data to rotate.
     Returns:
         Rotated NEC data in MAG frame.

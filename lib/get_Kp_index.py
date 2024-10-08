@@ -19,6 +19,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def __checkdate__(starttime, endtime):
     if starttime > endtime:
         raise NameError("Error! Start time must be before or equal to end time")
@@ -55,8 +56,8 @@ def getKpindex(starttime, endtime, index, status='all'):
     example: (time, index, status) = getKpindex('2021-09-29T12:00:00Z', '2021-10-01T12:00:00Z','Kp')
     ---------------------------------------------------------------------------------
     """
-    result_t = 0;
-    result_index = 0;
+    result_t = 0
+    result_index = 0
     result_s = 0
 
     if len(starttime) == 10 and len(endtime) == 10:

@@ -6,3 +6,6 @@ pandas
 tensorflow
 openpyxl
 scikit-learn
+spacepy
+scipy
+astropy

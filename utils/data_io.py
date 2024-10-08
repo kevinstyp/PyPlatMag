@@ -5,11 +5,13 @@ import pandas as pd
 import logging
 logger = logging.getLogger(__name__)
 
+
 def get_save_path(write_path, satellite_specifier, dataset_name="data"):
     path = write_path + satellite_specifier + "/" + dataset_name + "/"
     if not os.path.exists(path):
         os.makedirs(path)
     return path
+
 
 def save_df(data, write_path, satellite_specifier, year_month_specifier, dataset_name="data"):
     path = get_save_path(write_path, satellite_specifier,dataset_name) + year_month_specifier

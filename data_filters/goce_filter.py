@@ -1,13 +1,11 @@
 
-import data_filters.filter_functions as ff
-from training import training_data
 import logging
+
+import data_filters.filter_functions as ff
 
 logger = logging.getLogger(__name__)
 
-def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[], satellite_specifier="GOCE",
-                month_specifier="200912", euler_scaler=None,
-                meta_features=[], y_features=[]):
+def goce_filter(data, magnetic_activity=True, training=True, meta_features=[], y_features=[]):
     # x_all_columns -> training_columns
 
     ## Magnetic Activity - Filtering

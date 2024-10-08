@@ -5,6 +5,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 def get_output_filename(year, data_spec="hourly"):
     if data_spec == "hourly":
         outfile = f"omni2_kp_dst_f107_{year}.lst"
@@ -13,6 +14,7 @@ def get_output_filename(year, data_spec="hourly"):
     else:
         raise ValueError("data_spec must be 'hourly' or 'minute'")
     return outfile
+
 
 # TODO: Why this does not use outdir here? Where is the file written to?
 def fetch_omni_data(year, outdir, data_spec="hourly"):

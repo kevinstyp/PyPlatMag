@@ -5,7 +5,7 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-def evaluate_model(model_input_train, y_train, model_input_test, y_test, model, param, model_name,
+def evaluate_model(model_input_train, y_train, model_input_test, y_test, model,
                    year_month_specifiers, learn_config, number_of_bisa_neurons=0):
     year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
 

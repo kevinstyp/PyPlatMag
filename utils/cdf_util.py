@@ -3,6 +3,7 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
+
 def create_mastercdf(master_cdf_path):
     command = []
     skeletoncdf = os.path.join(os.environ["CDF_BIN"], "skeletoncdf")
@@ -15,7 +16,3 @@ def create_mastercdf(master_cdf_path):
     logger.info(f"Executing command: {' '.join(command)}")
 
     os.system(' '.join(command))
-
-
-
-

@@ -1,22 +1,21 @@
 
+import datetime
 import logging
+from os.path import isfile
 
 import numpy as np
 import pandas as pd
 import ppigrf.ppigrf
 import pyamps
-from pyquaternion import Quaternion
 from scipy import interpolate
-from utils import quaternion_util as qu
 
+import utils.load_omni_data as omni_loader
 import utils.time_handler as th
 from lib.dipole import Dipole
-import utils.load_omni_data as omni_loader
-from os.path import isfile
-
-import datetime
+from utils import quaternion_util as qu
 
 logger = logging.getLogger(__name__)
+
 
 def unpack_amps_params_file_to_df(auxiliary_data_path, year_month, use_cache=True):
     amps_params_path = omni_loader.get_output_filename(year=year_month[:4], data_spec="minute")

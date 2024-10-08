@@ -182,10 +182,13 @@ for act_date in sorted(unique_dates):
         # Can happen e.g. if one timestamp is found in wrong month somehow
 
         for conf_out_param in out_params:
+            name_part = ''
+            master_cdf_path = ''
+
+            output = {}
+            output['Timestamp'] = timestamp_series[sel]
             # Acal_Corr
             if conf_out_param == 'calcorr':
-                output = {}
-                output['Timestamp'] = timestamp_series[sel]
                 output['Latitude'] = z_all["RAW_Latitude"].values[sel]
                 output['Longitude'] = z_all["RAW_Longitude"].values[sel]
                 output['QDLatitude'] = z_all["APEX_QD_LAT"].values[sel]
@@ -204,13 +207,7 @@ for act_date in sorted(unique_dates):
                 master_cdf_path = cdf_template_path + cdf_config.version + '/template_aligncal_corr_v' + cdf_config.version + '.cdf'
 
             if conf_out_param == 'chaos':
-                output = {}
-                output['Timestamp'] = timestamp_series[sel]
-                print("output['Timestamp']: ", output['Timestamp'])
-
                 output['B_MAG'] = np.c_[y_all[:, 0][sel], y_all[:, 1][sel], y_all[:, 2][sel]]
-
-                print("output['B_MAG']: ", output['B_MAG'][:10])
                 output['B_NEC'] = np.c_[z_all['chaos7_b_nec_x'].values[sel], z_all['chaos7_b_nec_y'].values[sel],
                                         z_all['chaos7_b_nec_z'].values[sel]]
 
@@ -271,8 +268,8 @@ for act_date in sorted(unique_dates):
                         cdffile.attrs['Generation_date'] = datetime.datetime.utcnow().strftime("%04Y-%02m-%02d %02H:%02M:%02S")
                         cdffile.attrs['DOI'] = ''
                         cdffile.attrs['License'] = 'Creative Commons Attribution 4.0 International (CC BY 4.0)'
-                        for key in output.keys():
-                            cdffile[key] = np.squeeze(output[key])
+                        for okey in output.keys():
+                            cdffile[okey] = np.squeeze(output[okey])
                             print(cdffilename + ': no compression applied')
                     if key == 'Timestamp':
                         print("cdffile: ", cdffile['Timestamp'][0])

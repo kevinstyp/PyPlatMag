@@ -48,7 +48,7 @@ else:
     if file_check:
         # Merge, then apply
         nan_handler.nan_determination_merge(config.year_month_specifiers, config.write_path, satellite, config.nan_share)
-        nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite, z_all_features=config_goce.meta_features)
+        nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
 
     else:
         # Determine, then merge, then apply

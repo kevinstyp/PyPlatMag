@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 # TODO: Go through all files in customs package and refactor them
 # TODO: mean is not utilized?
 class CustomInitializer(tf.keras.initializers.Initializer):
@@ -27,7 +28,7 @@ class CustomInitializer(tf.keras.initializers.Initializer):
 
     def __call__(self, shape, dtype=None):
         # Must return a tensor of given shape
-        #zeros[0] = tf.constant([1.], dtype=dtype)
+        # zeros[0] = tf.constant([1.], dtype=dtype)
         upper_part = tf.eye(tf.subtract(shape[0], self.number_of_biot_savart_outputs), shape[1], dtype=dtype)
         for i in range(self.number_of_biot_savart_neurons):
             lower_part = tf.eye(3, shape[1], dtype=dtype)
