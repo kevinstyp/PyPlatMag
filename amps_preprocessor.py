@@ -116,6 +116,8 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     return data
 
 def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12nec", "q3_fgm12nec", "q4_fgm12nec"]):
+    # TODO: The performance of this method could be increased by only calculating the AMPS model for the QDLat restriction
+    ## applied at the end of the method. This would reduce the number of calculations needed.
     # We have merged all the needed data for the AMPS model now!
     # Assumption: The year of the processed data is the same for the current chunk (we compute in monthly chunks, so this
     #  should be true)
@@ -134,6 +136,15 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
                                                   np.zeros_like(data["RAW_Latitude"]))
     logger.debug(f"gdlat: {gdlat}")
     logger.debug(f"height: {height}")
+    logger.debug(f"glon: {data['RAW_Longitude']}")
+    logger.debug(f"data[RAW_Timestamp].values: {data['RAW_Timestamp'].values}")
+    logger.debug(f"data[Sw-20m].values: {data['Sw-20m'].values}")
+    logger.debug(f"data[Sw-20m].values: {list(data['Sw-20m'].values[:40])}")
+    logger.debug(f"data[By-20m].values: {data['By-20m'].values}")
+    logger.debug(f"data[Bz-20m].values: {data['Bz-20m'].values}")
+    logger.debug(f"data[tilt].values: {data['tilt'].values}")
+    logger.debug(f"data[F10.7].values: {data['F10.7'].values}")
+
     # get_B_space() claims to use glat and glon as 'geographic' coordinates,
     # but the function actually uses geodetic coordinates (according to KML).
     # This is also supported by the height parameter being requested in geodetic coordinates.
@@ -143,7 +154,6 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
                                        tilt=data["tilt"].values, f107=data["F10.7"].values)
     logger.debug(f"b_space: {B_e}, {B_n}, {B_u}")
     # Convert the geodetic return values of the get_B_space() function to geocentric coordinates
-    # TODO: Sanity check with returned "new" geocentric coordinates
     _, _, B_th, B_r = ppigrf.ppigrf.geod2geoc(gdlat, height, B_n, B_u)
     logger.debug(f"B_th, B_r: {B_th}, {B_r}")
     # Invert the sign of the B_u component, because then we have NEC values
@@ -157,7 +167,14 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     # in the opposite direction to the B_e, B_n, B_c components
     quat = np.column_stack([data[quaternion_columns[0]].values, data[quaternion_columns[1]].values,
                             data[quaternion_columns[2]].values, data[quaternion_columns[3]].values])
-    amps_mag = qu.rotate_nec2mag(quat, amps_nec)
+    logger.debug(f"quat: {quat}")
+    # Quat can contain nans
+    valid_mask = ~np.isnan(quat).any(axis=1)
+    quat_valid = quat[valid_mask]
+    amps_nec_valid = amps_nec[valid_mask]
+    amps_mag_valid = qu.rotate_nec2mag(quat_valid, amps_nec_valid)
+    amps_mag = np.full_like(amps_nec, np.nan)
+    amps_mag[valid_mask] = amps_mag_valid
 
     data["amps_b_mag_x"] = amps_mag[:, 0]
     data["amps_b_mag_y"] = amps_mag[:, 1]
