@@ -65,7 +65,8 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
     # TODO: optimizer is one of the parameters in learn_config
     optimizer = tf.keras.optimizers.Adam(learning_rate=learn_config.learning_rate)
 
-    model.compile(loss=learn_config.loss, optimizer=optimizer, metrics=['mse', 'mae'])
+    model.compile(loss=learn_config.loss, optimizer=optimizer, metrics=['mse', 'mae'],
+                  weighted_metrics=[])
 
     logger.info(f"model summary: {model.summary()}")
 

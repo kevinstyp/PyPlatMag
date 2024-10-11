@@ -61,7 +61,7 @@ logger.info(f"Data shape after filtering: {data.shape}")
 # Extract power currents if use_pinn is set
 train_config = config_goce.train_config
 if train_config.use_pinn:
-    current_parameters_file = os.path.join(dirname, config.current_parameters_file)
+    current_parameters_file = os.path.join(dirname, config_goce.current_parameters_file)
     goce_column_description_file = os.path.join(dirname, config_goce.goce_column_description_file)
     data, electric_current_df = tp.extract_electric_currents(data, current_parameters_file,
                                                              goce_column_description_file)

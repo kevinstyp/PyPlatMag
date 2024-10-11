@@ -37,9 +37,9 @@ def unpack_amps_params_file_to_df(auxiliary_data_path, year_month, use_cache=Tru
                   amps_param in amps_params_array]
     gps_times = th.datetime_to_gps(timestamps)
 
-    amps_params_df = amps_params_df.append(pd.DataFrame({"Amps_Timestamp": timestamps, "gps_sec": gps_times,
-                                       "By": amps_params_array['By'], "Bz": amps_params_array['Bz'], "Sw": amps_params_array['Sw'],
-                                       }))
+    amps_params_df = pd.concat([amps_params_df, pd.DataFrame({"Amps_Timestamp": timestamps, "gps_sec": gps_times,
+                                "By": amps_params_array['By'], "Bz": amps_params_array['Bz'], "Sw": amps_params_array['Sw'], })],
+                               ignore_index=True)
     return amps_params_df
 
 def enrich_df_with_amps_params_data(data, amps_params_df):

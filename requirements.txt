@@ -9,3 +9,5 @@ scikit-learn
 spacepy
 scipy
 astropy
+pyamps
+ppigrf

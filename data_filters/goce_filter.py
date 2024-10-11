@@ -5,7 +5,7 @@ import data_filters.filter_functions as ff
 
 logger = logging.getLogger(__name__)
 
-def goce_filter(data, magnetic_activity=True, training=True, meta_features=[], y_features=[]):
+def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[], meta_features=[], y_features=[]):
     # x_all_columns -> training_columns
 
     ## Magnetic Activity - Filtering
@@ -66,6 +66,7 @@ def goce_filter(data, magnetic_activity=True, training=True, meta_features=[], y
     data = data.drop(list(data.filter(regex='^str.*')), axis=1, errors='ignore')
 
     # TODO: Can be dropped, should be in read_files
-    data["DOY"] = data["RAW_Timestamp"].dt.day_of_year
+    if doy:
+        data["DOY"] = data["RAW_Timestamp"].dt.day_of_year.astype("float64")
 
     return data

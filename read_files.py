@@ -8,11 +8,11 @@ import yaml
 from box import Box
 
 import utils.time_handler as th
-from amps_preprocessor import enrich_df_with_amps_data, enrich_df_with_amps_params_data, unpack_amps_params_file_to_df
+from preprocessing.amps_preprocessor import enrich_df_with_amps_data, enrich_df_with_amps_params_data, unpack_amps_params_file_to_df
 from data_connectors.goce_data_connector import GOCEConnector
-from one_hot_encoder import one_hot_encode
+from preprocessing.one_hot_encoder import one_hot_encode
 from preprocessing import data_enricher
-from space_weather_preprocessor import enrich_df_with_hp_data, enrich_df_with_kp_data, unpack_hp30_file_to_df, \
+from preprocessing.space_weather_preprocessor import enrich_df_with_hp_data, enrich_df_with_kp_data, unpack_hp30_file_to_df, \
     unpack_kp_dst_file_to_df
 from utils import data_io
 
@@ -127,8 +127,6 @@ for year_month_specifier in config.year_month_specifiers:
 
     # Write data to disk
     data_io.save_df(data, config.write_path, config.satellite_specifier, year_month_specifier, dataset_name="data")
-
-    # TODO: What is going with those 'string_features'? Did not use them here
 
     logger.info(f"data-shape: {data.shape}")
     logger.info(f"Time for overall: {round(time.process_time() - first_time, 2)} seconds")

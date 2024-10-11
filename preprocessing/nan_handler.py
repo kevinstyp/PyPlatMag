@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 
 from utils import data_io
+# For "PerformanceWarning: DataFrame is highly fragmented." from pandas
+from warnings import simplefilter
+simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +38,7 @@ def nan_application(year_month_specifiers_list, write_path, satellite_specifier,
         # add them here, for consistent data (same number of columns in every month)
         missing_feats = [feat for feat in features_fillna_mean.index if feat not in df.columns]
         for col in missing_feats:
-            df[col] = features_fillna_mean[col]
+            df.loc[:, col] = features_fillna_mean[col]
 
         data_io.save_df(df, write_path, satellite_specifier, year_month_specifier, dataset_name="data_nonan")
 

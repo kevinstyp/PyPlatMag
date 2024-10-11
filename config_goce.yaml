@@ -19,9 +19,9 @@ train_config:
     drop_every: 90
 
 cdf_config:
-  cdf_path: '/home/styp/cdf_pyplatmag/'
-  cdf_template_path: './templates/goce_ml_'
-  version: '0301'
+  cdf_path: '/Volumes/Crucial X8/cdf_pyplatmag/'
+  cdf_template_path: 'templates/goce_ml_'
+  version: '0401'
   sat_suffix: 'GO'
 
 y_all_feature_keys: [ 'CHAOS_B_FGM1_0', 'CHAOS_B_FGM1_1', 'CHAOS_B_FGM1_2' ]

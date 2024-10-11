@@ -1,7 +1,7 @@
 satellite_specifier: 'GOCE'
 
-#year_month_specifiers: ["200912", "201001"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
-year_month_specifiers: ["201101"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
+year_month_specifiers: ["201002"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
+#year_month_specifiers: ["201101"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
 
 pandas_inplace: False
 log_level: 'DEBUG' # 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
@@ -27,4 +27,5 @@ string_conversion: 'one-hot' # or 'remove'
 
 nan_share: 0.2
 
-CDF_LIB: "~/lib/"
+CDF_LIB: "/Applications/cdf/cdf39_0-dist/lib"
+CDF_BIN: "/Applications/cdf/cdf39_0-dist/bin"

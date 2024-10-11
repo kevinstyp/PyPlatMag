@@ -8,7 +8,7 @@ def split_dataframe(data, y_features, meta_features):
     print("x_all.columns: ", x_all.columns.tolist())
     print("y_all.columns: ", y_all.columns.tolist())
     print("z_all.columns: ", z_all.columns.tolist())
-    weightings = z_all['weightings']
+    weightings = z_all['weightings'].copy()
 
     return (x_all, y_all, z_all, weightings)
 

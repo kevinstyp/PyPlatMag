@@ -117,5 +117,5 @@ model_name = config.model_output_path + config.model_name + '_' + config.satelli
 model.save(model_name + '.h5')
 
 # Evaluate the model on train and test data
-ep.evaluate_model(model_input_train, y_train, model_input_test, y_test, model, 'train', model_name, config.year_month_specifiers,
+ep.evaluate_model(model_input_train, y_train, model_input_test, y_test, model, config.year_month_specifiers,
                   train_config.learn_config, number_of_bisa_neurons=el_cu_train.shape[1])

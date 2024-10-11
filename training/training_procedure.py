@@ -123,10 +123,26 @@ def filter_correlation(x_all, training_file_path, year_month_specifiers, use_cac
         with open(corr_file, 'rb') as f:
             corr_indices = pickle.load(f)
     else:
+        # print("x_all.dtypes: ", x_all.dtypes)
+        # print("x_all.dtypes: ", list(x_all.dtypes))
+        # print("x_all.to_numpy(dtype=float64): ", x_all.to_numpy(dtype=np.float64))
+        # print("x_all.to_numpy(dtype=np.float64) dtype: ", x_all.to_numpy(dtype=np.float64).dtype)
+        # print(x_all.select_dtypes(include=['bool']).columns)
+        # # Is there a dtype object in the data?
+        # if 'object' in x_all.dtypes:
+        #     print("Found object in data")
+        #     # Print object columns
+        #     print(x_all.select_dtypes(include=['object']).columns)
+        #     # Convert object to float
+        #     x_all = x_all.astype(float)
+
         # Compute absolute of correlation matrix
-        corr = pd.DataFrame(np.corrcoef(x_all.values, rowvar=False)).abs()
-        # Get the upper triangle of the correlation matrix
-        upper_tri = corr.where(np.triu(np.ones(corr.shape), k=1).astype(np.bool))
+        corr = pd.DataFrame(np.corrcoef(x_all.to_numpy(), rowvar=False)).abs()
+        # Get the upper triangle of the correlation matrix without using np.bool (which is deprecated)
+        upper_tri = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
+
+
+
         # Find index of feature columns with correlation greater/equals than 1
         # and roughly computer precision (this is needed because of how the correlation is internally computed)
         corr_indices = [column for column in upper_tri.columns if
@@ -164,7 +180,7 @@ def scale_data(x_all, training_file_path, year_month_specifiers, use_cache):
 
 def split_train_test(arrays, test_split, batch_size):
     # TODO: Test this through: Is it really necessary to limit ourselves by the batch_size because of the custom implementation
-    ## of the layers?
+    #  of the layers?
     split_arrays = train_test_split(*arrays, test_size=test_split)
     max_size_train = split_arrays[0].shape[0] - split_arrays[0].shape[0] % batch_size
     max_size_test = split_arrays[1].shape[0] - split_arrays[1].shape[0] % batch_size
@@ -188,8 +204,8 @@ def rebalance_weightings(weightings):
     w1 = (s1 + s2 + s3) / (s1 + s2 * ratio_w2 + s3 * ratio_w3)
     w2 = w1 * ratio_w2
     w3 = w1 * ratio_w3
-    weightings[weightings == 2] = w1
-    weightings[weightings == 1.5] = w2
-    weightings[weightings == 1] = w3
+    weightings.loc[weightings == 2] = w1
+    weightings.loc[weightings == 1.5] = w2
+    weightings.loc[weightings == 1] = w3
     logger.info(f"Calculated rebalanced weightings: low ({w1}), mid({w2}), high({w3})")
     return weightings

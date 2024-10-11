@@ -37,8 +37,9 @@ def unpack_kp_dst_file_to_df(auxiliary_data_path, year_month, use_cache=True):
     logger.debug(f"len gps_times: {len(gps_times)}")
 
     # np.genfromtxt returns a structured ndarray, so we can access the columns by name
-    kp_df = kp_df.append(pd.DataFrame({"KP_Timestamp": timestamps, "gps_sec": gps_times, "KP": kp_dst_array['KP'],
-                                       "Dst": kp_dst_array['Dst'], "F10.7": kp_dst_array['F107']}))
+    kp_df = pd.concat([kp_df, pd.DataFrame({"KP_Timestamp": timestamps, "gps_sec": gps_times, "KP": kp_dst_array['KP'],
+                                            "Dst": kp_dst_array['Dst'], "F10.7": kp_dst_array['F107']})], ignore_index=True)
+
 
     # Set Spaceweather_Flag where values are 999.9 or 9999. depending on the type of column because that means the value is
     # missing as per definition on the OMNIWeb website: https://omniweb.gsfc.nasa.gov/html/ow_data.html
