@@ -1,7 +1,6 @@
 satellite_specifier: 'GOCE'
 
 year_month_specifiers: ["201002"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
-#year_month_specifiers: ["201101"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
 
 pandas_inplace: False
 log_level: 'DEBUG' # 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
@@ -11,9 +10,6 @@ write_path: /Volumes/Crucial X8/satellite_intermediate3/
 
 use_cache: False # True # False
 auxiliary_data_path: ./data/auxiliary_params/
-#space_weather_path: /Users/kevinstyp/Downloads/GOCE/all_kp_dst_indices_v3.lst
-#amps_params_path: /Users/kevinstyp/Downloads/GOCE/amps_params.lst
-#hp30_path: /Users/kevinstyp/Downloads/GOCE/all_hp30.lst
 
 orbit_counter_path: "/Volumes/Crucial X8/GOCE/ORBCNT/GO_ORBCNT_20090317T231001_20131109T234516_0101.h5"
 

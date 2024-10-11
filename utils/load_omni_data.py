@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime
 
 import requests
@@ -6,18 +7,17 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-def get_output_filename(year, data_spec="hourly"):
+def get_output_filename(year, outdir="./data/auxiliary_params/", data_spec="hourly"):
     if data_spec == "hourly":
-        outfile = f"omni2_kp_dst_f107_{year}.lst"
+        outfile = f"{outdir}omni2_kp_dst_f107_{year}.lst"
     elif data_spec == "minute":
-        outfile = f"omni_min_by_bz_vsw_{year}.lst"
+        outfile = f"{outdir}omni_min_by_bz_vsw_{year}.lst"
     else:
         raise ValueError("data_spec must be 'hourly' or 'minute'")
     return outfile
 
 
-# TODO: Why this does not use outdir here? Where is the file written to?
-def fetch_omni_data(year, outdir, data_spec="hourly"):
+def fetch_omni_data(year, outdir="./data/auxiliary_params/", data_spec="hourly"):
     """
     Fetches OMNI data for a given year.
 
@@ -67,7 +67,10 @@ def fetch_omni_data(year, outdir, data_spec="hourly"):
         params["res"] = "min"
         params["spacecraft"] = "omni_min"
 
-    outfile = get_output_filename(year, data_spec)
+    outfile = get_output_filename(year, outdir, data_spec)
+    # mkdir outdir if not exists
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
 
     response = requests.get(url, params=params, allow_redirects=True)
     if response.status_code == 200:

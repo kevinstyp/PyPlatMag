@@ -44,20 +44,6 @@ meta_features: [ 'RAW_Timestamp', 'KP_Timestamp',
                       'Spaceweather_Flag', 'HP_Timestamp', 'Hp30',
                  'Magnetic_Activity_Flag', 'Outlier_Flag', 'Interpolation_Distance_Flag', 'DOY',
                  'weightings', 'NaN_Flag',
-
-  #'kp_sel',
-  #'mlt', 'lon.trs',
-  #'ORB_Timestamp', 'ORB_Latitude', 'ORB_Longitude', 'ORB_Radius', 'ORB_MLT'
-  #  'gps_sec', 'q1_fgm32nec', 'q2_fgm32nec', 'q3_fgm32nec', 'q4_fgm32nec', 'lt', 'mjd2000', 'qdlon', 'mlat', 'q1_fgm12nec', 'q2_fgm12nec', 'q3_fgm12nec',
-  # 'q4_fgm12nec', 'q1_fgm22nec', 'q2_fgm22nec', 'q3_fgm22nec',
-  # 'q4_fgm22nec', 'chaos7_b_fgm2_x', 'chaos7_b_fgm2_y', 'chaos7_b_fgm2_z',
-  # 'chaos7_b_fgm3_x', 'chaos7_b_fgm3_y', 'chaos7_b_fgm3_z',
-  # 'chaos7_b_sc_x', 'chaos7_b_sc_y', 'chaos7_b_sc_z', 'FGM2_X_sc', 'FGM2_Y_sc', 'FGM2_Z_sc', 'FGM3_X_sc', 'FGM3_Y_sc',
-  # 'FGM3_Z_sc',
-  # 'FGM2_X_nec', 'FGM2_Y_nec', 'FGM2_Z_nec', 'FGM3_X_nec', 'FGM3_Y_nec',
-  # 'FGM3_Z_nec', 'chaos7_b_lit_nec_y', 'chaos7_b_lit_nec_z', 'chaos7_b_ext_nec_x',
-  # 'chaos7_b_ext_nec_y', 'chaos7_b_ext_nec_z',  'chaos7_b_cor_nec_x', 'chaos7_b_cor_nec_y', 'chaos7_b_cor_nec_z',
-  # 'chaos7_b_lit_nec_x'
 ]
 
 essential_calibration_keys: [ 'q1', 'q2', 'q3', 'q4', 'MHT00000', 'PHD94001', 'PHD94002', 'PHD94003', 'PHD94004', 'PHD94005',

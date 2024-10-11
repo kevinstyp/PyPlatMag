@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_output_filename(year, outdir="./data/auxiliary_params/"):
-    return f"{outdir}/hp30_{year}.h5"
+    return f"{outdir}hp30_{year}.h5"
 
 
 def fetch_Hp30_data(year, outdir="./data/auxiliary_params/"):

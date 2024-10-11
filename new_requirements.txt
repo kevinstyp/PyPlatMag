@@ -1,8 +1,0 @@
-numpy
-pyquaternion
-pyyaml???
-python-box
-tables
-pandas
-tensorflow
-openpyxl
