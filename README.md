@@ -25,7 +25,7 @@ cd pyplatmag
 pip install -r requirements.txt
 ```
 
-## Usage
+## Quick Start Guide
 1. First, download the GOCE platform magnetometer data.
 The format of the data is described in detail in the Data section.
 2. Update the config.yaml and config_goce.yaml files with the correct paths to the data and other important paths listed next:
@@ -34,25 +34,41 @@ The format of the data is described in detail in the Data section.
 # Calibration months
 year_month_specifiers: ['200911', '200912']
 # Path to the raw / input data
-goce_data_path: /home/styp/automl/data/GOCE/rawdata/
+goce_data_path: /home/user/data/GOCE/rawdata/
 # Path for the processed data
-write_path: /home/styp/automl/data/
+write_path: /home/user/data/
 # Path to the CDF library 'lib' and 'bin' folders
-CDF_LIB: "/home/styp/cdf-lib/cdf38_0-dist/lib"
-CDF_BIN: "/home/styp/cdf-lib/cdf38_0-dist/bin"
+CDF_LIB: "/home/user/cdf-lib/cdf38_0-dist/lib"
+CDF_BIN: "/home/user/cdf-lib/cdf38_0-dist/bin"
 ```
 #### config_goce.yaml
 ```yaml
 # config_goce.yaml
 # Path to write the calibration results as cdf files
 cdf_config:
-  cdf_path: '/Volumes/Crucial X8/cdf_pyplatmag/'
+  cdf_path: '/home/user/cdf_pyplatmag/'
 ```
 
-3. Then, run the calibration script:
+3. Then, run the calibration scripts:
 ```bash
-python TODO
+python read_files.py
+python read_files_nan_handling.py
+python train_pinn.py
+python generate_cdf_files.py
 ```
+
+## Customizing for other satellite missions
+
+TODO
+
+## API Documentation
+
+TODO: Do we want to do this? Needs thorough docstring documentation in the code.
+
+## License
+
+Big TODO: Add license
+
 
 ## Data
 
