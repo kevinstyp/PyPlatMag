@@ -1,11 +1,11 @@
-satellite_specifier: 'GOCE'
+satellite_specifier: GOCE
 
-year_month_specifiers: ["201002"] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
+year_month_specifiers: ['201002'] # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
 
-pandas_inplace: False
-log_level: 'DEBUG' # 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
+pandas_inplace: false
+log_level: DEBUG   # 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
 
-goce_data_path: /Volumes/Crucial X8/GOCE/rawdata/ # Previously base_path
+goce_data_path: /Volumes/Crucial X8/GOCE/rawdata/
 write_path: /Volumes/Crucial X8/satellite_intermediate3/
 
 use_cache: False # True # False
@@ -13,15 +13,15 @@ auxiliary_data_path: ./data/auxiliary_params/
 
 orbit_counter_path: "/Volumes/Crucial X8/GOCE/ORBCNT/GO_ORBCNT_20090317T231001_20131109T234516_0101.h5"
 
-model_output_path: "neuralnet/"
-model_name: "pinn"
+model_output_path: neuralnet/
+model_name: pinn
 model_year_months: None
 
 string_config_file: ???
 
-string_conversion: 'one-hot' # or 'remove'
+string_conversion: one-hot   # or 'remove'
 
 nan_share: 0.2
 
-CDF_LIB: "/Applications/cdf/cdf39_0-dist/lib"
-CDF_BIN: "/Applications/cdf/cdf39_0-dist/bin"
+CDF_LIB: /Applications/cdf/cdf39_0-dist/lib
+CDF_BIN: /Applications/cdf/cdf39_0-dist/bin
