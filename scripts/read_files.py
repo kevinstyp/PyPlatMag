@@ -1,27 +1,30 @@
 import logging
 import os
-import sys
-import time
+from pathlib import Path
 
 import pandas as pd
+import sys
+import time
 import yaml
 from box import Box
 
 import utils.time_handler as th
-from preprocessing.amps_preprocessor import enrich_df_with_amps_data, enrich_df_with_amps_params_data, unpack_amps_params_file_to_df
 from data_connectors.goce_data_connector import GOCEConnector
-from preprocessing.one_hot_encoder import one_hot_encode
 from preprocessing import data_enricher
+from preprocessing.amps_preprocessor import enrich_df_with_amps_data, enrich_df_with_amps_params_data, \
+    unpack_amps_params_file_to_df
+from preprocessing.one_hot_encoder import one_hot_encode
 from preprocessing.space_weather_preprocessor import enrich_df_with_hp_data, enrich_df_with_kp_data, unpack_hp30_file_to_df, \
     unpack_kp_dst_file_to_df
 from utils import data_io
 
 # Read config file
-dirname = os.path.dirname(__file__)
-config = Box.from_yaml(filename=os.path.join(dirname, "../config.yaml"), Loader=yaml.SafeLoader)
+dirname = os.path.dirname(Path(__file__).parent)
+config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
+
 
 def read_files():
     logger.info(f"config: {config}")

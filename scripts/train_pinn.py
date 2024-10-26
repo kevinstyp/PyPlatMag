@@ -1,21 +1,21 @@
 import logging
 import os
-import sys
+from pathlib import Path
 
 import pandas as pd
+import sys
 import yaml
 from box import Box
 
-from training import training_data
-from training import training_procedure as tp
-from training import evaluation_procedure as ep
-from data_filters.goce_filter import goce_filter
-from utils import data_io
 import training.neural_network_training as nn_train
+from data_filters.goce_filter import goce_filter
+from training import evaluation_procedure as ep, training_procedure as tp
+from utils import data_io
 
-dirname = os.path.dirname(__file__)
-config = Box.from_yaml(filename=os.path.join(dirname, "../config.yaml"), Loader=yaml.SafeLoader)
-config_goce = Box.from_yaml(filename=os.path.join(dirname, "../config_goce.yaml"), Loader=yaml.SafeLoader)
+dirname = os.path.dirname(Path(__file__).parent)
+config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
+config_goce = Box.from_yaml(filename=os.path.join(dirname, "./config_goce.yaml"), Loader=yaml.SafeLoader)
+train_config = config_goce.train_config
 logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_level),
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -30,53 +30,14 @@ def train_pinn():
     data = goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[],
                        meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
 
-    # TODO: is this still necessary, what was the reason for this?
-    # Save exact amount of preprocessed columns for later reusage as pickle file
+    electric_current_df, x_all, y_all, z_all = tp.prepare_data(data, config, config_goce, dirname, train_config,
+                                                               use_cache=config.use_cache)
 
-    # extract the currents & voltages for pinn before scaling is applied
-    train_config = config_goce.train_config
-    if train_config.use_pinn:
-        current_parameters_file = os.path.join(dirname, config_goce.current_parameters_file)
-        goce_column_description_file = os.path.join(dirname, config_goce.goce_column_description_file)
-        data, electric_current_df = tp.extract_electric_currents(data, current_parameters_file, goce_column_description_file)
-        # TODO Change back to above line
-        # electric_current_df = data[["PHT12780", "PHT12800"]]
-        # data = data.drop(["PHT12780", "PHT12800"], axis=1)
-
-    # TODO: Why not use decompose_dataframe() function?
-    # TODO: Is the modulo from the preprocess_data_array.py still needed?
-    # TODO: Decompose is the much better name, split sounds like train / test which does not happen here
-    x_all, y_all, z_all, weightings = training_data.split_dataframe(data, config_goce.y_all_feature_keys, config_goce.meta_features)
-
-    # weightings: Rebalance for sample sizes of the different regions (low, mid, and high latitudes)
-    weightings = tp.rebalance_weightings(weightings)
-
-    # TODO: What about AMPS inclusion: Add CHAOS and AMPS model
+    weightings = tp.extract_and_rebalance_weightings(z_all)
     if train_config.use_amps:
         logger.info(f"Using AMPS model for training")
         y_all = y_all + z_all[['amps_b_mag_x', 'amps_b_mag_y', 'amps_b_mag_z']].values
-
-    # Add solar activity, and DOY
-    x_all = tp.add_solar_activity(x_all, z_all)
-    x_all = tp.add_day_of_year(x_all, z_all)
-
     del z_all
-
-    logger.info(f"x_all - columns assigned after split: {x_all.columns.tolist()}")
-
-    training_file_path = os.path.join(dirname, train_config.training_file_path)
-    if train_config.filter_std:
-        x_all = tp.filter_std(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
-        logger.debug(f"x_all - shape after std filtering: {x_all.shape}")
-
-    if train_config.filter_correlation:
-        x_all = tp.filter_correlation(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
-        logger.debug(f"x_all - shape after correlation filtering: {x_all.shape}")
-
-    x_all = tp.scale_data(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
-
-    logger.info(f"x_all - shape before splitting: {x_all.shape}")
-    logger.info(f"Final columns for training: {x_all.columns.tolist()}")
 
     # Split the different parts in train / test
     if train_config.use_pinn:
@@ -122,5 +83,6 @@ def train_pinn():
     ep.evaluate_model(model_input_train, y_train, model_input_test, y_test, model, config.year_month_specifiers,
                       train_config.learn_config, number_of_bisa_neurons=el_cu_train.shape[1])
 
+
 if __name__ == '__main__':
-    main()
+    train_pinn()

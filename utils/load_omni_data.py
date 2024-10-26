@@ -17,7 +17,7 @@ def get_output_filename(year, outdir="./data/auxiliary_params/", data_spec="hour
     return outfile
 
 
-def fetch_omni_data(year, outdir="./data/auxiliary_params/", data_spec="hourly"):
+def fetch_omni_data(year, outdir="data/auxiliary_params/", data_spec="hourly"):
     """
     Fetches OMNI data for a given year.
 
@@ -68,6 +68,7 @@ def fetch_omni_data(year, outdir="./data/auxiliary_params/", data_spec="hourly")
         params["spacecraft"] = "omni_min"
 
     outfile = get_output_filename(year, outdir, data_spec)
+    logger.debug(f"outfile: {outfile}")
     # mkdir outdir if not exists
     if not os.path.exists(outdir):
         os.makedirs(outdir)

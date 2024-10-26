@@ -1,22 +1,27 @@
 import datetime
 import logging
 import os
-import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import sys
 import yaml
 from box import Box
 
 import publication.training_retrieval as tr
 from data_filters.goce_filter import goce_filter
-from training import training_data, training_procedure as tp
-from utils import data_io, quaternion_util as qu
-from utils import cdf_util as cu
+from training import training_procedure as tp
+from utils import cdf_util as cu, data_io, quaternion_util as qu
+from tensorflow import keras
+from training.customs.pinn_biot_savart_layer import BiotSavartLayer
+from training.customs.custom_initializer import CustomInitializer
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-dirname = os.path.dirname(__file__)
-config = Box.from_yaml(filename=os.path.join(dirname, "../config.yaml"), Loader=yaml.SafeLoader)
-config_goce = Box.from_yaml(filename=os.path.join(dirname, "../config_goce.yaml"), Loader=yaml.SafeLoader)
+dirname = os.path.dirname(Path(__file__).parent)
+config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)
+config_goce = Box.from_yaml(filename=os.path.join(dirname, "./config_goce.yaml"), Loader=yaml.SafeLoader)
+train_config = config_goce.train_config
 
 os.environ["CDF_LIB"] = config.CDF_LIB
 os.environ["CDF_BIN"] = config.CDF_BIN
@@ -26,10 +31,10 @@ logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_lev
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+
 def generate_cdf_files():
     logger.info(f"config: {config}")
     logger.info(f"config_goce: {config_goce}")
-
 
     # Get the year_months used to save auxilary files
     if config.model_year_months == "None":
@@ -37,58 +42,19 @@ def generate_cdf_files():
     else:
         year_months = config.model_year_months
 
-    # Load the auxilary files created during training
-    train_config = config_goce.train_config
-    training_file_path = os.path.join(dirname, train_config.training_file_path)
-    std_indices, corr_indices, hk_scaler = tr.read_in_pickles_small(training_file_path, year_months)
-
     # Specify the model to be loaded
     model_name = config.model_output_path + config.model_name + '_' + config.satellite_specifier + '_' + year_months + '.h5'
     logger.info(f"model_name: {model_name}")
 
-    # Now similar to training
-    # Load the data
+    # Read dataframe
     data = data_io.read_df(config.write_path, config.satellite_specifier, config.year_month_specifiers, dataset_name="data_nonan")
     logger.info(f"Data shape after reading: {data.shape}")
     data = goce_filter(data, magnetic_activity=True, doy=True, training=False, training_columns=[],
                 meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
     logger.info(f"Data shape after filtering: {data.shape}")
 
-
-    # TODO: Check whether something happens because of this
-    # Leave align_x_columns away?: Columns are sorted -> not necessary
-    # Weight handling: Weights arent needed anymore -> not necessary
-    # Check if someone randomizes the columns at some point :O -> not necessary
-
-    # Extract power currents if use_pinn is set
-    train_config = config_goce.train_config
-    if train_config.use_pinn:
-        current_parameters_file = os.path.join(dirname, config_goce.current_parameters_file)
-        goce_column_description_file = os.path.join(dirname, config_goce.goce_column_description_file)
-        data, electric_current_df = tp.extract_electric_currents(data, current_parameters_file,
-                                                                 goce_column_description_file)
-
-
-    # TODO: training_data, training_prcedure -> Maybe, rename them to preprare_data, prepare_procedure or smth
-    x_all, y_all, z_all, weightings = training_data.split_dataframe(data, config_goce.y_all_feature_keys, config_goce.meta_features)
-
-    # Add solar activity, and DOY
-    x_all = tp.add_solar_activity(x_all, z_all)
-    x_all = tp.add_day_of_year(x_all, z_all)
-
-    # Std, Corr, Scaling
-    if train_config.filter_std:
-        x_all = tp.filter_std(x_all, training_file_path, config.year_month_specifiers, use_cache=True)
-        logger.debug(f"x_all - shape after std filtering: {x_all.shape}")
-
-    if train_config.filter_correlation:
-        x_all = tp.filter_correlation(x_all, training_file_path, config.year_month_specifiers, use_cache=True)
-        logger.debug(f"x_all - shape after correlation filtering: {x_all.shape}")
-
-    x_all = tp.scale_data(x_all, training_file_path, config.year_month_specifiers, config.use_cache)
-
-    logger.info(f"x_all - shape before splitting: {x_all.shape}")
-    logger.info(f"Final columns for generating predictions: {x_all.columns.tolist()}")
+    electric_current_df, x_all, y_all, z_all = tp.prepare_data(data, config, config_goce, dirname, train_config,
+                                                            use_cache=True)
 
     # Check how to split network building and network training etc.
     if train_config.use_pinn:
@@ -97,33 +63,10 @@ def generate_cdf_files():
         model_input = x_all
 
     # TODO: Test that the loaded model really produces the same results, otherwise need to change to "manual" weight loading
-    from tensorflow import keras
-    from training.customs.pinn_biot_savart_layer import BiotSavartLayer
-    from training.customs.custom_initializer import CustomInitializer
     model = keras.models.load_model(model_name,
                                      custom_objects={
                                          'CustomInitializer': CustomInitializer,
                                                      'BiotSavartLayer': BiotSavartLayer})
-    # number_of_bisa_neurons = electric_current_df.shape[1]
-    # from training.model_builder import build_network_goce_pinn
-    # import tensorflow as tf
-    # model = build_network_goce_pinn(input_shape=(model_input.shape[1] - number_of_bisa_neurons),
-    #                                         #input_shape=(x_train[0].shape[1]),
-    #                                         batch_size=train_config.learn_config.batch_size,
-    #                                                 number_of_bisa_neurons=number_of_bisa_neurons,
-    #                                                  )
-    # optimizer = tf.keras.optimizers.Adam(learning_rate=1e-2)#, clipnorm=0.1)
-    # model.compile(loss='mean_squared_error',  # loss='mean_squared_error',
-    #               optimizer=optimizer,
-    #               metrics=['mse', 'mae'])
-    # model.load_weights(model_name)
-    for layer in model.layers:
-        print("layer.name: ", layer.name)
-        # print("layer.get_weights(): ", layer.get_weights())
-        if "biot_savart_layer_" in layer.name:
-            # TODO: Tweak this, so the Radii are ouput
-            print("layer.get_weights(): ", layer.get_weights())
-            print("Length: ", np.linalg.norm(layer.get_weights()[0]))
 
     learn_config = train_config.learn_config
     number_of_bisa_neurons = electric_current_df.shape[1]
@@ -167,7 +110,6 @@ def generate_cdf_files():
 
     y_all = y_all.values
 
-    from sklearn.metrics import mean_absolute_error, mean_squared_error
     meanae = mean_absolute_error(y_all[~magnetic_activity_flag], predictions_fgm[~magnetic_activity_flag])
     meanse = mean_squared_error(y_all[~magnetic_activity_flag], predictions_fgm[~magnetic_activity_flag])
     std1 = np.std(y_all[~magnetic_activity_flag] - predictions_fgm[~magnetic_activity_flag])
@@ -278,4 +220,4 @@ def generate_cdf_files():
                     cdffile.close()
 
 if __name__ == '__main__':
-    main()
+    generate_cdf_files()

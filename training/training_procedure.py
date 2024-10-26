@@ -11,13 +11,10 @@ from sklearn.model_selection import train_test_split
 logger = logging.getLogger(__name__)
 
 
-def decompose_dataframe(df):
-    y_all_features = config_goce.y_all_feature_keys
-    z_all_features = config_goce.z_all_feature_keys
-    y_all = df[y_all_features]
-    z_all = df[z_all_features]
-    x_all = df.drop(z_all_features, axis=1).drop(y_all_features, axis=1)
-
+def decompose_dataframe(data, y_features, meta_features):
+    y_all = data[y_features]
+    z_all = data[meta_features]
+    x_all = data.drop(meta_features, axis=1).drop(y_features, axis=1)
     return (x_all, y_all, z_all)
 
 
@@ -193,7 +190,8 @@ def split_train_test(arrays, test_split, batch_size):
     return split_arrays
 
 
-def rebalance_weightings(weightings):
+def extract_and_rebalance_weightings(z_all):
+    weightings = z_all['weightings'].copy()
     # Weightings sample size
     s1 = weightings[weightings == 2].shape[0]  # low latitudes
     s2 = weightings[weightings == 1.5].shape[0]  # mid latitudes
@@ -209,3 +207,36 @@ def rebalance_weightings(weightings):
     weightings.loc[weightings == 1] = w3
     logger.info(f"Calculated rebalanced weightings: low ({w1}), mid({w2}), high({w3})")
     return weightings
+
+
+def prepare_data(data, config, config_goce, dirname, train_config, use_cache=True):
+    training_file_path = os.path.join(dirname, train_config.training_file_path)
+    # Extract power currents if use_pinn is set before scaling is applied
+    electric_current_df = None
+    if train_config.use_pinn:
+        current_parameters_file = os.path.join(dirname, config_goce.current_parameters_file)
+        goce_column_description_file = os.path.join(dirname, config_goce.goce_column_description_file)
+        data, electric_current_df = extract_electric_currents(data, current_parameters_file, goce_column_description_file)
+
+    # TODO: Why not use decompose_dataframe() function?
+    # TODO: Is the modulo from the preprocess_data_array.py still needed?
+    # TODO: Decompose is the much better name, split sounds like train / test which does not happen here
+    # TODO: training_data, training_prcedure -> Maybe, rename them to preprare_data, prepare_procedure or smth
+    x_all, y_all, z_all = decompose_dataframe(data, config_goce.y_all_feature_keys, config_goce.meta_features)
+
+    # Add solar activity, and DOY
+    x_all = add_solar_activity(x_all, z_all)
+    x_all = add_day_of_year(x_all, z_all)
+    logger.info(f"x_all - columns assigned after split: {x_all.columns.tolist()}")
+
+    # Std, Corr, Scaling
+    if train_config.filter_std:
+        x_all = filter_std(x_all, training_file_path, config.year_month_specifiers, use_cache)
+        logger.debug(f"x_all - shape after std filtering: {x_all.shape}")
+    if train_config.filter_correlation:
+        x_all = filter_correlation(x_all, training_file_path, config.year_month_specifiers, use_cache)
+        logger.debug(f"x_all - shape after correlation filtering: {x_all.shape}")
+    x_all = scale_data(x_all, training_file_path, config.year_month_specifiers, use_cache)
+    logger.info(f"x_all - shape before splitting: {x_all.shape}")
+    logger.info(f"Final columns: {x_all.columns.tolist()}")
+    return electric_current_df, x_all, y_all, z_all

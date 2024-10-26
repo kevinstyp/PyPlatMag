@@ -67,7 +67,7 @@ TODO: Do we want to do this? Needs thorough docstring documentation in the code.
 
 ## License
 
-Big TODO: Add license
+We use the MIT license, see LICENSE file.
 
 
 ## Data
