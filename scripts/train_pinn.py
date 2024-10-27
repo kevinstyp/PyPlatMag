@@ -29,6 +29,7 @@ def train_pinn():
 
     data = goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[],
                        meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
+    tp.save_columns(data, config_goce, config.year_month_specifiers, dirname)
 
     electric_current_df, x_all, y_all, z_all = tp.prepare_data(data, config, config_goce, dirname, train_config,
                                                                use_cache=config.use_cache)

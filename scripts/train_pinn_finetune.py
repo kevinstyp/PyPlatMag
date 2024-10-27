@@ -24,19 +24,19 @@ def train_pinn_finetune():
     logger.info(f"config:   {config}")
     logger.info(f"config_goce: {config_goce}")
 
-    # Get the year_months used to save auxilary files
-    if config.model_year_months == "None":
-        year_months = '_'.join([config.year_month_specifiers[0], config.year_month_specifiers[-1]])
-    else:
-        year_months = config.model_year_months
-
-    # Specify the model to be loaded
-    model_name = config.model_output_path + config.model_name + '_' + config.satellite_specifier + '_' + year_months + '.h5'
-    model_path = os.path.join(dirname, model_name)
-    logger.info(f"model_name: {model_name}")
-    logger.info(f"model_path: {model_path}")
-
     for year_month_specifier in config.year_month_specifiers:
+        # Get the year_months used to save auxilary files
+        if config.model_year_months == "None":
+            year_months = '_'.join([config.year_month_specifiers[0], config.year_month_specifiers[-1]])
+        else:
+            year_months = config.model_year_months
+
+        # Specify the model to be loaded
+        model_name = config.model_output_path + config.model_name + '_' + config.satellite_specifier + '_' + year_months + '.h5'
+        model_path = os.path.join(dirname, model_name)
+        logger.info(f"model_name: {model_name}")
+        logger.info(f"model_path: {model_path}")
+
         # Read dataframe for training
         data = data_io.read_df(config.write_path, config.satellite_specifier, [year_month_specifier], dataset_name="data_nonan")
         logger.info(f"Data shape after reading: {data.shape}")
@@ -46,7 +46,7 @@ def train_pinn_finetune():
         logger.info(f"Data shape after filtering: {data.shape}")
 
         electric_current_df, x_all, y_all, z_all = tp.prepare_data(data, config, config_goce, dirname, train_config,
-                                                                   use_cache=config.use_cache)
+                                                                   use_cache=True)
 
         weightings = tp.extract_and_rebalance_weightings(z_all)
         if train_config.use_amps:

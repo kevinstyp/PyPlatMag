@@ -18,6 +18,47 @@ def decompose_dataframe(data, y_features, meta_features):
     return (x_all, y_all, z_all)
 
 
+def save_columns(data, config_goce, year_month_specifiers, dirname):
+    training_file_path = os.path.join(dirname, config_goce.train_config.training_file_path)
+    year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
+    xy_columns_file = training_file_path + year_months + "/xy_columns.pkl"
+    xy_columns = data.drop(config_goce.meta_features, axis=1, errors='ignore').columns.tolist()
+    logger.debug("xy-columns: ", xy_columns)
+    if not os.path.exists(xy_columns_file):
+        os.makedirs(os.path.dirname(xy_columns_file), exist_ok=True)
+    print("writing x_all_columns_file.")
+    with open(xy_columns_file, 'wb') as f:
+        pickle.dump(xy_columns, f)
+    # missing_feats = [feat for feat in features_fillna_mean.index if feat not in df.columns]
+    # for col in missing_feats:
+    #     df.loc[:, col] = features_fillna_mean[col]
+
+
+def align_columns(data, config, config_goce, year_month_specifiers, dirname):
+    training_file_path = os.path.join(dirname, config_goce.train_config.training_file_path)
+    year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
+    xy_columns_file = training_file_path + year_months + "/xy_columns.pkl"
+    # Read in used columns without meta features for dataframe during training
+    with open(xy_columns_file, 'rb') as f:
+        xy_columns = pickle.load(f)
+
+    # Read in fill-in values for nan-columns
+    full_read_path = config.write_path + config.satellite_specifier + "/"
+    with open(full_read_path + "features_fillna_mean.pickle", 'rb') as f:
+        features_fillna_mean = pickle.load(f)
+
+    # Check whether all available columns during training (possibly multiple months) are also available during this month,
+    # otherwise fill them with the corresponding nan-fill values as was done before
+    for col in xy_columns:
+        if col not in data.columns:
+            data[col] = features_fillna_mean[col]
+
+    # # Same order as what is saved, to later match with processing again
+    # data = data[xy_columns]
+    # print("x_all-shape after extra columns: ", x_all.shape)
+    return data
+
+
 def extract_electric_currents_parameter_file(current_parameters_file, goce_column_description_file):
     # read in csv into pandas
     filename = goce_column_description_file
@@ -60,7 +101,6 @@ def extract_electric_currents(df, current_parameters_file, goce_column_descripti
     electric_current_df = df[available_currents]
     df = df.drop(available_currents, axis=1)
     logger.info(f"data shape after extracting electric currents: {df.shape}")
-
     return df, electric_current_df
 
 
@@ -79,14 +119,6 @@ def filter_std(x_all, training_file_path, year_month_specifiers, use_cache):
     year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
     std_file = training_file_path + year_months + "/std_column_indices.pkl"
     logger.info(f"std_file: {std_file}")
-
-    # # TODO: What was columns used for here?
-    # columns = []
-    # if isinstance(x_all, pd.DataFrame):
-    #     print("Converted x_all to array")
-    #     columns = x_all.columns
-    #     print("Got columns: ", len(columns))
-    #     x_all = x_all.values
 
     # Check if the file exists and if use_cache is True
     if use_cache and os.path.exists(std_file):
@@ -120,25 +152,10 @@ def filter_correlation(x_all, training_file_path, year_month_specifiers, use_cac
         with open(corr_file, 'rb') as f:
             corr_indices = pickle.load(f)
     else:
-        # print("x_all.dtypes: ", x_all.dtypes)
-        # print("x_all.dtypes: ", list(x_all.dtypes))
-        # print("x_all.to_numpy(dtype=float64): ", x_all.to_numpy(dtype=np.float64))
-        # print("x_all.to_numpy(dtype=np.float64) dtype: ", x_all.to_numpy(dtype=np.float64).dtype)
-        # print(x_all.select_dtypes(include=['bool']).columns)
-        # # Is there a dtype object in the data?
-        # if 'object' in x_all.dtypes:
-        #     print("Found object in data")
-        #     # Print object columns
-        #     print(x_all.select_dtypes(include=['object']).columns)
-        #     # Convert object to float
-        #     x_all = x_all.astype(float)
-
         # Compute absolute of correlation matrix
         corr = pd.DataFrame(np.corrcoef(x_all.to_numpy(), rowvar=False)).abs()
         # Get the upper triangle of the correlation matrix without using np.bool (which is deprecated)
         upper_tri = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
-
-
 
         # Find index of feature columns with correlation greater/equals than 1
         # and roughly computer precision (this is needed because of how the correlation is internally computed)
