@@ -15,7 +15,12 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
     logger.debug(f"Number of threads used by tensorflow: {tf.config.threading.get_inter_op_parallelism_threads()}")
     logger.debug(f"Tensorflow version: {tf.__version__}")
     logger.info(f"learn_config: {learn_config}")
-    epochs = learn_config.epochs
+    if model_path: # If model_path to an existing model is given, a finetune training is performed
+        epochs = learn_config.epochs_finetune
+        learning_rate = learn_config.learning_rate_finetune
+    else:
+        epochs = learn_config.epochs
+        learning_rate = learn_config.learning_rate
     batch_size = learn_config.batch_size
 
     if neural_net_variant == 0:
@@ -58,12 +63,12 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
         logger.info(f"Loading model from given path: {model_path}")
         model.load_weights(model_path)
 
-    schedule = sd.StepDecay(initAlpha=learn_config.learning_rate, factor=0.5, dropEvery=learn_config.drop_every,
+    schedule = sd.StepDecay(initAlpha=learning_rate, factor=0.5, dropEvery=learn_config.drop_every,
                             first_extra=learn_config.first_extra)
     stepdecay = LearningRateScheduler(schedule)
 
     # TODO: optimizer is one of the parameters in learn_config
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learn_config.learning_rate)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
     model.compile(loss=learn_config.loss, optimizer=optimizer, metrics=['mse', 'mae'],
                   weighted_metrics=[])
