@@ -4,9 +4,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def create_mastercdf(master_cdf_path):
+def create_mastercdf(master_cdf_path,config='./'):
     command = []
-    skeletoncdf = os.path.join(os.environ["CDF_BIN"], "skeletoncdf")
+    skeletoncdf = os.path.join(config["CDF_BIN"], "skeletoncdf")
     if skeletoncdf is None:
         raise ValueError("CDF_BIN environment variable not set.")
     command.append(skeletoncdf)

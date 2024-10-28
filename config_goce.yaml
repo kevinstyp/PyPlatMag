@@ -10,7 +10,7 @@ train_config:
   test_split: 0.2
   neural_network_variant: 3 #0
   learn_config:
-    epochs: 100
+    epochs: 20
     batch_size: 1500
     learning_rate: 0.01
     optimizer: adam
@@ -18,6 +18,8 @@ train_config:
     first_extra: 0 #50
     drop_every: 90
 
+    epochs_finetune: 20
+    learning_rate_finetune: 0.00001
 cdf_config:
   cdf_path: data/cdf/
   cdf_template_path: templates/goce_ml_

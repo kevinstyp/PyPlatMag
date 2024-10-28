@@ -188,7 +188,7 @@ def generate_cdf_files():
                     print("master_cdf_path: ", master_cdf_path)
                     if not os.path.isfile(master_cdf_path):
                         logger.warning(f"Master CDF file {master_cdf_path} not found. Creating from template.")
-                        cu.create_mastercdf(master_cdf_path)
+                        cu.create_mastercdf(master_cdf_path,config)
 
                     cdffile = pycdf.CDF(cdffilename, masterpath=master_cdf_path)
                     cdffile.attrs['TITLE'] = os.path.basename(cdffilename).replace('.cdf', '')
