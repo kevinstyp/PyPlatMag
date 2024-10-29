@@ -5,7 +5,7 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def one_hot_encode(data, pandas_inplace):
+def one_hot_encode(data):
     str_columns = []
     str_columns_binary = []
 

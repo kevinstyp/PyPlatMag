@@ -6,9 +6,9 @@ import numpy as np
 import pandas as pd
 from scipy import interpolate
 
+import utils.load_Hp30_data as hp30_loader
 import utils.load_omni_data as omni_loader
 import utils.time_handler as th
-import utils.load_Hp30_data as hp30_loader
 
 logger = logging.getLogger(__name__)
 

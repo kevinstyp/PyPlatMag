@@ -41,12 +41,10 @@ class BiotSavartLayer(keras.layers.Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
     def call(self, inputs):
-        # with tf.GradientTape() as tape:
         if self.verbose:
             tf.print("inputs: ", inputs)
             tf.print("self.w_1 / radius: ", self.w_1)
             tf.print("self.w_2 / area_vector: ", self.w_2)
-        # r_vector = tf.matmul(inputs, self.w_1)
         r_vector = self.w_1
         area_orth_vector = self.w_2
         if self.verbose:

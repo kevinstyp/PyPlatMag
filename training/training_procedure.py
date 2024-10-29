@@ -5,7 +5,6 @@ import pickle
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-
 from sklearn.model_selection import train_test_split
 
 logger = logging.getLogger(__name__)
@@ -29,9 +28,6 @@ def save_columns(data, config_goce, year_month_specifiers, dirname):
     print("writing x_all_columns_file.")
     with open(xy_columns_file, 'wb') as f:
         pickle.dump(xy_columns, f)
-    # missing_feats = [feat for feat in features_fillna_mean.index if feat not in df.columns]
-    # for col in missing_feats:
-    #     df.loc[:, col] = features_fillna_mean[col]
 
 
 def align_columns(data, config, config_goce, year_month_specifiers, dirname):
@@ -174,9 +170,6 @@ def filter_correlation(x_all, training_file_path, year_month_specifiers, use_cac
 def scale_data(x_all, training_file_path, year_month_specifiers, use_cache):
     year_months = '_'.join([year_month_specifiers[0], year_month_specifiers[-1]])
     scaler_file = training_file_path + year_months + "/scaler.pkl"
-    # if isinstance(x_all, pd.DataFrame):
-    #     logger.info(f"Converted x_all to array")
-    #     x_all = x_all.values
     # Check if the file exists and if use_cache is True
     if use_cache and os.path.exists(scaler_file):
         with open(scaler_file, 'rb') as f:

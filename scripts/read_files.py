@@ -40,7 +40,7 @@ def read_files():
         logger.debug(f"GOCE data head(3): {data.head(3)}")
 
         if config.string_conversion == 'one-hot':
-            data = one_hot_encode(data, config.pandas_inplace)
+            data = one_hot_encode(data)
         # elif config.string_conversion == 'remove':
         else:
             pass
@@ -100,7 +100,6 @@ def read_files():
                                     'chaos7_b_sc_x', 'chaos7_b_sc_y', 'chaos7_b_sc_z', 'FGM2_X_sc', 'FGM2_Y_sc', 'FGM2_Z_sc',
                                     'FGM3_X_sc', 'FGM3_Y_sc',
                                     'FGM3_Z_sc',
-                                    # 'chaos7_b_fgm1_x', 'chaos7_b_fgm1_y', 'chaos7_b_fgm1_z',
                                     'FGM2_X_nec', 'FGM2_Y_nec', 'FGM2_Z_nec', 'FGM3_X_nec', 'FGM3_Y_nec',
                                     'FGM3_Z_nec',
                                     ]
@@ -118,7 +117,7 @@ def read_files():
                              left_by=None, right_by=None, suffixes=('', '_orb'), tolerance=None,
                              allow_exact_matches=True,
                              direction='backward').rename(columns={'copy_egg_iaq_index': 'egg_iaq_index'}).set_index('egg_iaq_index')
-        # direction='backward').rename(columns={'copy_gps_sec': 'gps_sec'}).set_index('gps_sec')
+
         data = data.set_index("RAW_Timestamp", drop=False)
         logger.debug(f"Data head after orbit counter merge: {data.head(3)}")
         if {'ORB_Timestamp', 'ORB_Latitude', 'ORB_Longitude', 'ORB_Radius', 'ORB_MLT'}.issubset(data.columns):

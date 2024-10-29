@@ -1,8 +1,8 @@
 import logging
 import os
-import time
 
 import pandas as pd
+import time
 
 from data_connectors.data_connector import Connector
 
@@ -23,7 +23,7 @@ class GOCEConnector(Connector):
         self.base_name1 = "GO_data_"
         self.base_name2 = ".dat.gz"
         self.base_name3 = ".h5"
-        
+
         self.base_path = base_path
 
     # TODO: This method was just copied, no further optimization

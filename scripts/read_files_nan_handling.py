@@ -1,7 +1,7 @@
 import logging
 import os
-import sys
 
+import sys
 import yaml
 from box import Box
 

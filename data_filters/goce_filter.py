@@ -17,23 +17,6 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
     else:
         logger.warning("WARNING: No Magnetic-Activity-Filtering, but Flag added.")
 
-
-    # if not training:
-    #     ## This basically ensures during evaluation that the same columns as 'finally' wanted are kept, the others are thrwon away
-    #     ## in terms of NaN-Handling
-    #     ## Then remaining NaN-values are basically what was taken because of small_nan_share, so they are filled with 0s as was
-    #     ## done during training
-    #     to_drop = data.drop(meta_features, axis=1, errors='ignore').isna().any()
-    #     print(f"to_drop: {to_drop}")
-    #     import numpy as np
-    #     print(f"np.sum(to_drop): {np.sum(to_drop)}")
-    #     ## x_all_columns need to be kept in the data in the end
-    #     to_drop[data.columns & training_columns] = False
-    #     print(f"to_drop: {to_drop}")
-    #     print(f"data: {data}")
-    #     data = data.loc[:, ~to_drop]
-    #     logger.info(f"after non-training handling data.shape: {data.shape}")
-
     # TODO: All of this NaN Handling seems odd to me, maybe quickly implement it, then comment it out for testing
     # TODO: This should be rewritten: If there are Nans, the Nan-Handling did not work properly -> Throw an error here
     logger.info(f"Columns containing NaNs: {data.drop(meta_features, axis=1, errors='ignore').columns[data.drop(meta_features, axis=1, errors='ignore').isna().any()]}")

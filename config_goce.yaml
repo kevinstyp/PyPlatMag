@@ -8,7 +8,7 @@ train_config:
   filter_correlation: true
   training_file_path: config_goce/
   test_split: 0.2
-  neural_network_variant: 3 #0
+  neural_network_variant: 1
   learn_config:
     epochs: 100
     batch_size: 1500

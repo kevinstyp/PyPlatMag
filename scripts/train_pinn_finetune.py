@@ -87,15 +87,6 @@ def train_pinn_finetune():
                                                     neural_net_variant=train_config.neural_network_variant,
                                                     model_path=model_path,
                                                     )
-            # model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
-            #                                         epochs=epochs,
-            #                                         batch_size=batch_size,
-            #                                         number_of_bisa_neurons=input_pinn_train.shape[1],
-            #                                         model_path=model_path,
-            #                                         learning_rate=finetune_learning_rate,
-            #                                         weightings_train=weightings_train,
-            #                                         weightings_test=weightings_test,
-            #                                         neural_net_variant=4,)
         else:
             model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
                                                     weightings_train=weightings_train,

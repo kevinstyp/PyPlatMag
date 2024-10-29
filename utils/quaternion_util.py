@@ -1,6 +1,6 @@
 
-from pyquaternion import Quaternion
 import numpy as np
+from pyquaternion import Quaternion
 
 
 def rotate_mag2nec(quaternions_mag2nec, mag_data):

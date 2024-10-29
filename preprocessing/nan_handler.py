@@ -1,13 +1,14 @@
 import logging
 import os
 import pickle
+# For "PerformanceWarning: DataFrame is highly fragmented." from pandas
+from warnings import simplefilter
 
 import numpy as np
 import pandas as pd
 
 from utils import data_io
-# For "PerformanceWarning: DataFrame is highly fragmented." from pandas
-from warnings import simplefilter
+
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
 logger = logging.getLogger(__name__)

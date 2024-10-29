@@ -11,7 +11,6 @@ def filter_flag(data, flag):
     logger.info(f"Found {np.sum(data[flag] >= 1)} samples with {flag} Flag.")
     logger.debug(f"Timestamps of this data: {data.index.where(data[flag] >= 1)}")
 
-    #data = data.drop((data[flag] >= 1).index, axis='index')
     data = data.drop(data[data[flag] >= 1].index, axis='index')
     data = data.reset_index(drop=True)
     logger.info(f"Data shape after filtering for {flag} flag: {data.shape}")

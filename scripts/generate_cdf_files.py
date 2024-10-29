@@ -8,15 +8,14 @@ import pandas as pd
 import sys
 import yaml
 from box import Box
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+from tensorflow import keras
 
-import publication.training_retrieval as tr
 from data_filters.goce_filter import goce_filter
 from training import training_procedure as tp
-from utils import cdf_util as cu, data_io, quaternion_util as qu
-from tensorflow import keras
-from training.customs.pinn_biot_savart_layer import BiotSavartLayer
 from training.customs.custom_initializer import CustomInitializer
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from training.customs.pinn_biot_savart_layer import BiotSavartLayer
+from utils import cdf_util as cu, data_io, quaternion_util as qu
 
 dirname = os.path.dirname(Path(__file__).parent)
 config = Box.from_yaml(filename=os.path.join(dirname, "./config.yaml"), Loader=yaml.SafeLoader)

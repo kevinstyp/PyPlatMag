@@ -24,8 +24,8 @@ def build_network_goce_pinn(input_shape, batch_size,
 
     # Dense part of the network for the non-electric-current data / housekeeping data
     inputs_x = tf.keras.Input(shape=input_shape)
-    dense1 = tf.keras.layers.Dense(384, activation='elu')(inputs_x)  # 192 384 #512 #kernel_regularizer='l2'
-    dense2 = tf.keras.layers.Dense(128, activation='elu')(dense1)  # 96 128 #192
+    dense1 = tf.keras.layers.Dense(384, activation='elu')(inputs_x)
+    dense2 = tf.keras.layers.Dense(128, activation='elu')(dense1)
     dense3 = tf.keras.layers.Dense(3)(dense2)
 
     inputs_list = []
