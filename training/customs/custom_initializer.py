@@ -12,7 +12,7 @@ class CustomInitializer(tf.keras.initializers.Initializer):
     # For the serialization of this custom Initializer
     def get_config(self):
         config = {"mean": self.mean,
-                    "number_of_biot_savart_neurons": self.number_of_biot_savart_neurons,
+                  "number_of_biot_savart_neurons": self.number_of_biot_savart_neurons,
                   }
         base_config = super(CustomInitializer, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -27,4 +27,3 @@ class CustomInitializer(tf.keras.initializers.Initializer):
         # Factor in self.mean
         result = tf.multiply(upper_part, self.mean)
         return result
-

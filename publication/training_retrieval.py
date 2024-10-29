@@ -22,4 +22,3 @@ def read_in_pickles_small(training_file_path, year_months):
     with open(scaler_file, 'rb') as f:
         hk_scaler = pickle.load(f)
     return (std_indices, corr_indices, hk_scaler)
-

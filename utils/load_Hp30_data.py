@@ -27,7 +27,7 @@ def fetch_Hp30_data(year, outdir="./data/auxiliary_params/"):
     logger.debug(f"{startdate} to {enddate}")
 
     time_Hp30, index_Hp30, status_Hp30 = getKpindex(startdate, enddate, 'Hp30')
-    #time_Ap, index_Ap, status_Ap = getKpindex(startdate, enddate, 'Ap')
+    # time_Ap, index_Ap, status_Ap = getKpindex(startdate, enddate, 'Ap')
 
     hp30_df = pd.DataFrame({'HP_Timestamp': pd.to_datetime(time_Hp30).tz_localize(None), 'Hp30': index_Hp30})
     logger.debug(f"hp30_df.shape: {hp30_df.shape}")

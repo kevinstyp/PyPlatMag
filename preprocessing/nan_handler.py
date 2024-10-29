@@ -44,7 +44,8 @@ def nan_application(year_month_specifiers_list, write_path, satellite_specifier,
         data_io.save_df(df, write_path, satellite_specifier, year_month_specifier, dataset_name="data_nonan")
 
 
-def nan_determination_merge(year_month_specifiers_list, write_path, satellite_specifier, nan_share=0.2, essential_calibration_keys=[]):
+def nan_determination_merge(year_month_specifiers_list, write_path, satellite_specifier, nan_share=0.2,
+                            essential_calibration_keys=[]):
     df_column_nancount_list = []
     df_column_mean_list = []
     df_overall_list = []
@@ -71,12 +72,12 @@ def nan_determination_merge(year_month_specifiers_list, write_path, satellite_sp
     logger.info(f"Total number of columns: {len(df_columns)}")
 
     # TODO: Remove these lines, if unnecessary
-    #global_df_column_mean = dict.fromkeys(df_columns, 0)
-    #global_df_column_count = dict.fromkeys(df_columns, 0)
+    # global_df_column_mean = dict.fromkeys(df_columns, 0)
+    # global_df_column_count = dict.fromkeys(df_columns, 0)
 
     # Nancount list contains a list for each column-key, which contains the nancounts for each month
     nancount_list = [[dictionary[column] if column in dictionary else 0 for dictionary in df_column_nancount_list] for column in
-                  df_columns]
+                     df_columns]
     logger.debug(f"nancount_list: {nancount_list}")
     # Mean list contains a list for each column-key, which contains the means for each month
     mean_list = [[dictionary[column] if column in dictionary else 0 for dictionary in df_column_mean_list] for column in
@@ -99,7 +100,7 @@ def nan_determination_merge(year_month_specifiers_list, write_path, satellite_sp
 
     # Sum up the means for each column, taking into account their share of the total samples
     partly_mean_list = [
-        np.nansum([ # Sum up the mean contributions of each month weighed by their share of the total samples
+        np.nansum([  # Sum up the mean contributions of each month weighed by their share of the total samples
             (df_overall_list[j] - local_nancount[j]) / df_overall_list[j] * local_mean[j] * (
                     df_overall_list[j] - local_nancount[j]) / total_samples
             for j in range(len(local_nancount))

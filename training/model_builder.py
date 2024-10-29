@@ -37,7 +37,7 @@ def build_network_goce_pinn(input_shape, batch_size,
     for i in range(number_of_bisa_neurons):
         inputs_current, output_current = biot_savart_input(name=str(i), batch_size_input=batch_size, mean_init=4.0,
                                                            mean_init_2=0.0,
-                                                  trainable_init=trainable_pinn)
+                                                           trainable_init=trainable_pinn)
         inputs_list.append(inputs_current)
         concatenation_list.append(output_current)
 

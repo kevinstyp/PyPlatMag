@@ -1,9 +1,9 @@
-
 import logging
 
 import data_filters.filter_functions as ff
 
 logger = logging.getLogger(__name__)
+
 
 def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_columns=[], meta_features=[], y_features=[]):
     # x_all_columns -> training_columns
@@ -19,8 +19,10 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
 
     # TODO: All of this NaN Handling seems odd to me, maybe quickly implement it, then comment it out for testing
     # TODO: This should be rewritten: If there are Nans, the Nan-Handling did not work properly -> Throw an error here
-    logger.info(f"Columns containing NaNs: {data.drop(meta_features, axis=1, errors='ignore').columns[data.drop(meta_features, axis=1, errors='ignore').isna().any()]}")
-    data = data.drop(data.drop(meta_features, axis=1, errors='ignore').index.difference(data.drop(meta_features, axis=1, errors='ignore').dropna(axis='index').index))
+    logger.info(
+        f"Columns containing NaNs: {data.drop(meta_features, axis=1, errors='ignore').columns[data.drop(meta_features, axis=1, errors='ignore').isna().any()]}")
+    data = data.drop(data.drop(meta_features, axis=1, errors='ignore').index.difference(
+        data.drop(meta_features, axis=1, errors='ignore').dropna(axis='index').index))
     logger.info(f"Data shape after dropping NaNs: {data.shape}")
 
     if training:
@@ -42,7 +44,6 @@ def goce_filter(data, magnetic_activity=True, doy=True, training=True, training_
         data = ff.filter_flag(data, "Interpolation_Distance_Flag")
     else:
         logger.warning(f"WARNING: No interpolation distance filtering, but Flag added.")
-
 
     # TODO: This could be tried to move to 'z_all' instead of dropping
     # Filter out all columns starting with 'str', related to star trackers and thus positional encoding

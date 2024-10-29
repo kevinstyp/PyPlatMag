@@ -64,7 +64,8 @@ def read_files():
         logger.info("Time for unpacking Kp/Dst data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
         start_overall = time.process_time()
         # TODO: This is called amps_params, but actually they are space-weather parameters, why not import them all in one step?
-        amps_params_df = unpack_amps_params_file_to_df(auxiliary_data_path, year_month_specifier)  # Solar wind speed, Bx, By, F10.7
+        amps_params_df = unpack_amps_params_file_to_df(auxiliary_data_path,
+                                                       year_month_specifier)  # Solar wind speed, Bx, By, F10.7
         # 22.4 sec
         logger.info("Time for unpacking Amps Params data: " + str(round(time.process_time() - start_overall, 2)) + " seconds")
         start_overall = time.process_time()
@@ -116,7 +117,8 @@ def read_files():
                              left_index=False, right_index=False, by=None,
                              left_by=None, right_by=None, suffixes=('', '_orb'), tolerance=None,
                              allow_exact_matches=True,
-                             direction='backward').rename(columns={'copy_egg_iaq_index': 'egg_iaq_index'}).set_index('egg_iaq_index')
+                             direction='backward').rename(columns={'copy_egg_iaq_index': 'egg_iaq_index'}).set_index(
+            'egg_iaq_index')
 
         data = data.set_index("RAW_Timestamp", drop=False)
         logger.debug(f"Data head after orbit counter merge: {data.head(3)}")

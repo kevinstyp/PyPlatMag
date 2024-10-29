@@ -47,11 +47,11 @@ def flag_outlier(data, y_features, orbit_removal=True, mag_columns=['FGM1_X', 'F
     logger.debug(f"Number of outliers: {len(set_of_indices)}")
 
     data['Outlier_Flag'] = 0
-    if orbit_removal: # Remove the entire orbit of data, if it contains at least 1 outlier
+    if orbit_removal:  # Remove the entire orbit of data, if it contains at least 1 outlier
         # Calculate set of indices of outlier containing orbits, then set the Outlier_Flag to 1 for all data points in these orbits
         all_orbit_indices = data[data["ORB_OrbitNo"].isin(set(data.iloc[list(set_of_indices)]["ORB_OrbitNo"]))].index
         data.loc[all_orbit_indices, 'Outlier_Flag'] = 1
-    else: # Remove only the data points that themselves are outliers
+    else:  # Remove only the data points that themselves are outliers
         data.loc[list(set_of_indices), 'Outlier_Flag'] = 1
     return data
 
@@ -60,4 +60,3 @@ def flag_samples_by_interpolation_distance(data):
     data['Interpolation_Distance_Flag'] = 0
     data.loc[data['fgm_gapsize'] > 17, 'Interpolation_Distance_Flag'] = 1
     return data
-

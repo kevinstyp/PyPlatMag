@@ -45,14 +45,15 @@ def generate_cdf_files():
         logger.info(f"model_path: {model_path}")
 
         # Read dataframe
-        data = data_io.read_df(config.write_path, config.satellite_specifier, config.year_month_specifiers, dataset_name="data_nonan")
+        data = data_io.read_df(config.write_path, config.satellite_specifier, config.year_month_specifiers,
+                               dataset_name="data_nonan")
         logger.info(f"Data shape after reading: {data.shape}")
         data = goce_filter(data, magnetic_activity=True, doy=True, training=False, training_columns=[],
-                    meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
+                           meta_features=config_goce.meta_features, y_features=config_goce.y_all_feature_keys)
         logger.info(f"Data shape after filtering: {data.shape}")
 
         electric_current_df, x_all, y_all, z_all = tp.prepare_data(data, config, config_goce, dirname, train_config,
-                                                                use_cache=True)
+                                                                   use_cache=True)
 
         # Check how to split network building and network training etc.
         if train_config.use_pinn:
@@ -62,17 +63,19 @@ def generate_cdf_files():
 
         # TODO: Test that the loaded model really produces the same results, otherwise need to change to "manual" weight loading
         model = keras.models.load_model(model_path,
-                                         custom_objects={
-                                             'CustomInitializer': CustomInitializer,
-                                                         'BiotSavartLayer': BiotSavartLayer})
+                                        custom_objects={
+                                            'CustomInitializer': CustomInitializer,
+                                            'BiotSavartLayer': BiotSavartLayer})
 
         learn_config = train_config.learn_config
         number_of_bisa_neurons = electric_current_df.shape[1]
         print(f"model_input.shape: {model_input.shape}")
         print(f"model_input.columns: {model_input.columns.tolist()}")
         predictions_fgm = model.predict(
-            [model_input.iloc[:, :-number_of_bisa_neurons]] + [model_input.iloc[:, i] for i in range(model_input.shape[1] - number_of_bisa_neurons, model_input.shape[1])],
-                                        batch_size=learn_config.batch_size)
+            [model_input.iloc[:, :-number_of_bisa_neurons]] + [model_input.iloc[:, i] for i in
+                                                               range(model_input.shape[1] - number_of_bisa_neurons,
+                                                                     model_input.shape[1])],
+            batch_size=learn_config.batch_size)
 
         del model_input, x_all, model
 
@@ -81,7 +84,7 @@ def generate_cdf_files():
         predictions_nec = qu.rotate_mag2nec(quaternions, predictions_fgm)
 
         ## Flag generation
-        b_flag = np.zeros_like(predictions_fgm[:,0])
+        b_flag = np.zeros_like(predictions_fgm[:, 0])
         b_flag = b_flag + z_all['Outlier_Flag'].values * 1
         b_flag = b_flag + z_all['Interpolation_Distance_Flag'].values * 2
         b_flag = b_flag + z_all['Spaceweather_Flag'].values * 4
@@ -93,7 +96,6 @@ def generate_cdf_files():
         cdf_config = config_goce.cdf_config
 
         out_params = ["calcorr", "chaos"]
-
 
         base_out_path = cdf_config.cdf_path + config.satellite_specifier + '/cal_pinn/'
 
@@ -137,8 +139,10 @@ def generate_cdf_files():
                         output['QDLongitude'] = z_all["APEX_QD_LON"].values[sel]
                         # Conversion to meters in saved CDF files
                         output['Radius'] = z_all["r.trs"].values[sel] * 1000.
-                        output['B_MAG'] = np.c_[predictions_fgm[:, 0][sel], predictions_fgm[:, 1][sel], predictions_fgm[:, 2][sel]]
-                        output['B_NEC'] = np.c_[predictions_nec[:, 0][sel], predictions_nec[:, 1][sel], predictions_nec[:, 2][sel]]
+                        output['B_MAG'] = np.c_[
+                            predictions_fgm[:, 0][sel], predictions_fgm[:, 1][sel], predictions_fgm[:, 2][sel]]
+                        output['B_NEC'] = np.c_[
+                            predictions_nec[:, 0][sel], predictions_nec[:, 1][sel], predictions_nec[:, 2][sel]]
 
                         output['q_MAG_NEC'] = np.c_[
                             quaternions[:, 0][sel], quaternions[:, 1][sel], quaternions[:, 2][sel], quaternions[:, 3][sel]]
@@ -186,7 +190,7 @@ def generate_cdf_files():
                         print("master_cdf_path: ", master_cdf_path)
                         if not os.path.isfile(master_cdf_path):
                             logger.warning(f"Master CDF file {master_cdf_path} not found. Creating from template.")
-                            cu.create_mastercdf(master_cdf_path,config)
+                            cu.create_mastercdf(master_cdf_path, config)
 
                         cdffile = pycdf.CDF(cdffilename, masterpath=master_cdf_path)
                         cdffile.attrs['TITLE'] = os.path.basename(cdffilename).replace('.cdf', '')
@@ -207,7 +211,8 @@ def generate_cdf_files():
                                 cdffile = pycdf.CDF(cdffilename, masterpath=master_cdf_path)
                                 cdffile.attrs['TITLE'] = (os.path.split(cdffilename)[-1]).replace('.cdf', '')
                                 cdffile.attrs['ORIGINAL_PRODUCT_NAME'] = (os.path.split(cdffilename)[-1]).replace('.cdf', '')
-                                cdffile.attrs['Generation_date'] = datetime.datetime.utcnow().strftime("%04Y-%02m-%02d %02H:%02M:%02S")
+                                cdffile.attrs['Generation_date'] = datetime.datetime.utcnow().strftime(
+                                    "%04Y-%02m-%02d %02H:%02M:%02S")
                                 cdffile.attrs['DOI'] = ''
                                 cdffile.attrs['License'] = 'Creative Commons Attribution 4.0 International (CC BY 4.0)'
                                 for okey in output.keys():
@@ -216,6 +221,7 @@ def generate_cdf_files():
                             if key == 'Timestamp':
                                 print("cdffile: ", cdffile['Timestamp'][0])
                         cdffile.close()
+
 
 if __name__ == '__main__':
     generate_cdf_files()

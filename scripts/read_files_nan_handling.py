@@ -15,6 +15,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_lev
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+
 def read_files_nan_handling():
     logger.info(f"config: {config}")
     logger.info(f"config_goce: {config_goce}")
@@ -30,7 +31,8 @@ def read_files_nan_handling():
     ### 1: Check availability of everything for nan_application
     if config.use_cache and os.path.exists(save_path + "features_to_drop.pickle"):
         # Apply them to all year_month_specifiers
-        nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
+        nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite,
+                                    meta_features=config_goce.meta_features)
 
 
     else:
@@ -44,20 +46,24 @@ def read_files_nan_handling():
         for directory in directories:
             # Check if all files are available
             if not os.path.exists(save_path + directory + "/df_column_nancount.pickle") or not os.path.exists(
-                    save_path + directory + "/df_column_mean.pickle") or not os.path.exists(save_path + directory + "/df_overall.pickle"):
+                    save_path + directory + "/df_column_mean.pickle") or not os.path.exists(
+                save_path + directory + "/df_overall.pickle"):
                 file_check = False
                 break
         if file_check:
             # Merge, then apply
             nan_handler.nan_determination_merge(config.year_month_specifiers, config.write_path, satellite, config.nan_share)
-            nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
+            nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite,
+                                        meta_features=config_goce.meta_features)
 
         else:
             # Determine, then merge, then apply
-            nan_handler.nan_determination(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
+            nan_handler.nan_determination(config.year_month_specifiers, config.write_path, satellite,
+                                          meta_features=config_goce.meta_features)
             nan_handler.nan_determination_merge(config.year_month_specifiers, config.write_path, satellite, config.nan_share,
                                                 config_goce.essential_calibration_keys)
-            nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite, meta_features=config_goce.meta_features)
+            nan_handler.nan_application(config.year_month_specifiers, config.write_path, satellite,
+                                        meta_features=config_goce.meta_features)
 
         ### 3: Check availability / just apply of everything for nan_determination
         # TODO: Is there something missing here?

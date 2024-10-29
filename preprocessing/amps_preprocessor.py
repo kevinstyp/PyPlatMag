@@ -1,4 +1,3 @@
-
 import datetime
 import logging
 from os.path import isfile
@@ -27,20 +26,24 @@ def unpack_amps_params_file_to_df(auxiliary_data_path, year_month, use_cache=Tru
         logger.info(f"Loading data from cache: {amps_params_path}")
 
     amps_params_array = np.genfromtxt(amps_params_path,
-                                   dtype=('U4', 'U3', 'U2', 'U2', np.float64, np.float64, np.float64),
-                                   names=['year', 'dayofyear', 'hour', 'minute', "By", "Bz", "Sw"])
+                                      dtype=('U4', 'U3', 'U2', 'U2', np.float64, np.float64, np.float64),
+                                      names=['year', 'dayofyear', 'hour', 'minute', "By", "Bz", "Sw"])
     logger.debug(f"amps_params_array: {amps_params_array}")
     logger.debug(f"amps_params_array.shape: {amps_params_array.shape}")
     amps_params_df = pd.DataFrame(columns=["Amps_Timestamp", "gps_sec", "By", "Bz", "Sw"])
 
-    timestamps = [datetime.datetime.strptime(amps_param[0] + ' ' + amps_param[1] + ' ' + amps_param[2] + ' ' + amps_param[3], '%Y %j %H %M') for
-                  amps_param in amps_params_array]
+    timestamps = [
+        datetime.datetime.strptime(amps_param[0] + ' ' + amps_param[1] + ' ' + amps_param[2] + ' ' + amps_param[3], '%Y %j %H %M')
+        for
+        amps_param in amps_params_array]
     gps_times = th.datetime_to_gps(timestamps)
 
     amps_params_df = pd.concat([amps_params_df, pd.DataFrame({"Amps_Timestamp": timestamps, "gps_sec": gps_times,
-                                "By": amps_params_array['By'], "Bz": amps_params_array['Bz'], "Sw": amps_params_array['Sw'], })],
+                                                              "By": amps_params_array['By'], "Bz": amps_params_array['Bz'],
+                                                              "Sw": amps_params_array['Sw'], })],
                                ignore_index=True)
     return amps_params_df
+
 
 def enrich_df_with_amps_params_data(data, amps_params_df):
     # Set flag where values are 999.9 or 9999. depending on the type of column because that means the value is missing
@@ -50,11 +53,14 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     amps_params_df.loc[amps_params_df['Sw'] >= 9999., 'Spaceweather_Flag'] = 1.
 
     # Interpolate the values to the data
-    by_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["By"], kind='linear', fill_value="extrapolate")
+    by_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["By"], kind='linear',
+                                           fill_value="extrapolate")
     data["By"] = by_interpolater(data["gps_sec"])
-    bz_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Bz"], kind='linear', fill_value="extrapolate")
+    bz_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Bz"], kind='linear',
+                                           fill_value="extrapolate")
     data["Bz"] = bz_interpolater(data["gps_sec"])
-    sw_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Sw"], kind='linear', fill_value="extrapolate")
+    sw_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Sw"], kind='linear',
+                                           fill_value="extrapolate")
     data["Sw"] = sw_interpolater(data["gps_sec"])
 
     # now set to null in reference dataframe for rolling window to ignore these values
@@ -86,11 +92,14 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     # TODO: Can this happen after values have been filled? It's exactly 9
     logger.debug(f"Sum of nulls in By-20m before filling: {amps_params_df['By-20m'].isnull().sum()}")
     logger.debug(f"Sum of nulls in Sw-20m before filling: {amps_params_df['Sw-20m'].isnull().sum()}")
-    by20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["By-20m"], kind='linear', fill_value="extrapolate")
+    by20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["By-20m"], kind='linear',
+                                              fill_value="extrapolate")
     data["By-20m"] = by20m_interpolater(data["gps_sec"])
-    bz20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Bz-20m"], kind='linear', fill_value="extrapolate")
+    bz20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Bz-20m"], kind='linear',
+                                              fill_value="extrapolate")
     data["Bz-20m"] = bz20m_interpolater(data["gps_sec"])
-    sw20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Sw-20m"], kind='linear', fill_value="extrapolate")
+    sw20m_interpolater = interpolate.interp1d(amps_params_df["gps_sec"], amps_params_df["Sw-20m"], kind='linear',
+                                              fill_value="extrapolate")
     data["Sw-20m"] = sw20m_interpolater(data["gps_sec"])
 
     # Find Nan values in By-20m, Bz-20m, Sw-20m and set Spaceweather_Flag to 1. The rest got meaningfully interpolated
@@ -108,11 +117,15 @@ def enrich_df_with_amps_params_data(data, amps_params_df):
     logger.debug(f"data['Bz-20m'].max() raw: {data['Bz-20m'].max()}")
     logger.debug(f"data['Sw-20m'].max() raw: {data['Sw-20m'].max()}")
     # Log max values with spaceweather flag set to 0
-    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max()}")
-    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max()}")
-    logger.debug(f"data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max()}")
+    logger.debug(
+        f"data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'By-20m'].max()}")
+    logger.debug(
+        f"data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Bz-20m'].max()}")
+    logger.debug(
+        f"data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max(): {data.loc[data['Spaceweather_Flag'] == 0., 'Sw-20m'].max()}")
 
     return data
+
 
 def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12nec", "q3_fgm12nec", "q4_fgm12nec"]):
     # TODO: The performance of this method could be increased by only calculating the AMPS model for the QDLat restriction
@@ -123,10 +136,10 @@ def enrich_df_with_amps_data(data, quaternion_columns=["q1_fgm12nec", "q2_fgm12n
     epoch_year = data.index[0].year
     epoch_month = data.index[0].month
     logger.info(f"Enriching with AMPS data for: {epoch_year}, {epoch_month}")
-    dipole_year_month = Dipole(epoch_year + (epoch_month-1.)/12.)
+    dipole_year_month = Dipole(epoch_year + (epoch_month - 1.) / 12.)
 
-    logger.debug(f"epoch_year_month: {epoch_year + (epoch_month-1.)/12.}")
-    #dipole_year_month = Dipole(epoch_year)
+    logger.debug(f"epoch_year_month: {epoch_year + (epoch_month - 1.) / 12.}")
+    # dipole_year_month = Dipole(epoch_year)
     data["tilt"] = dipole_year_month.tilt(data.index)
     logger.debug(f"tilt_values: {data['tilt']}")
     # Convert the lat/lon/height from geocentric to geodetic with geoc2geod function from the ppigrf package

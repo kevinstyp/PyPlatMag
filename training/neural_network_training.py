@@ -15,7 +15,7 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
     logger.debug(f"Number of threads used by tensorflow: {tf.config.threading.get_inter_op_parallelism_threads()}")
     logger.debug(f"Tensorflow version: {tf.__version__}")
     logger.info(f"learn_config: {learn_config}")
-    if model_path: # If model_path to an existing model is given, a finetune training is performed
+    if model_path:  # If model_path to an existing model is given, a finetune training is performed
         epochs = learn_config.epochs_finetune
         learning_rate = learn_config.learning_rate_finetune
     else:
@@ -29,10 +29,10 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
     elif neural_net_variant == 1:
         # x_train is a list and first element contains the non-current input data
         model = build_network_goce_pinn(input_shape=(x_train.shape[1] - number_of_bisa_neurons),
-                                        #input_shape=(x_train[0].shape[1]),
+                                        # input_shape=(x_train[0].shape[1]),
                                         batch_size=batch_size,
-                                                number_of_bisa_neurons=number_of_bisa_neurons,
-                                                 )
+                                        number_of_bisa_neurons=number_of_bisa_neurons,
+                                        )
 
     if model_path is not None:
         logger.info(f"Loading model from given path: {model_path}")
@@ -66,14 +66,16 @@ def goce_training(x_train, y_train, x_test, y_test, weightings_train, weightings
             callbacks=callbacks)
     elif neural_net_variant == 1:
         history = model.fit(
-            [x_train.iloc[:, :-number_of_bisa_neurons]] + [x_train.iloc[:, i] for i in range(x_train.shape[1] - number_of_bisa_neurons, x_train.shape[1])],
+            [x_train.iloc[:, :-number_of_bisa_neurons]] + [x_train.iloc[:, i] for i in
+                                                           range(x_train.shape[1] - number_of_bisa_neurons, x_train.shape[1])],
             y_train,
             epochs=epochs,
             batch_size=batch_size,
             shuffle=True,
             sample_weight=weightings_train,
             validation_data=(
-                [x_test.iloc[:, :-number_of_bisa_neurons]] + [x_test.iloc[:, i] for i in range(x_test.shape[1] - number_of_bisa_neurons, x_test.shape[1])],
+                [x_test.iloc[:, :-number_of_bisa_neurons]] + [x_test.iloc[:, i] for i in
+                                                              range(x_test.shape[1] - number_of_bisa_neurons, x_test.shape[1])],
                 y_test, weightings_test),
             callbacks=callbacks)
 

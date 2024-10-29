@@ -1,11 +1,10 @@
-
 import logging
 import os
 
 logger = logging.getLogger(__name__)
 
 
-def create_mastercdf(master_cdf_path,config='./'):
+def create_mastercdf(master_cdf_path, config='./'):
     command = []
     skeletoncdf = os.path.join(config["CDF_BIN"], "skeletoncdf")
     if skeletoncdf is None:

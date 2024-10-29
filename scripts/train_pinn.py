@@ -20,6 +20,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.getLevelName(config.log_lev
                     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
 
+
 def train_pinn():
     logger.info(f"config:   {config}")
     logger.info(f"config_goce: {config_goce}")
@@ -61,7 +62,8 @@ def train_pinn():
     logger.info(f"model_input_train - shape after merging electric currents: {model_input_train.shape}")
 
     if train_config.use_pinn:
-        model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
+        model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test,
+                                                y_test=y_test,
                                                 number_of_bisa_neurons=el_cu_train.shape[1],
                                                 weightings_train=weightings_train,
                                                 weightings_test=weightings_test,
@@ -69,7 +71,8 @@ def train_pinn():
                                                 neural_net_variant=train_config.neural_network_variant,
                                                 )
     else:
-        model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test, y_test=y_test,
+        model, history = nn_train.goce_training(x_train=model_input_train, y_train=y_train, x_test=model_input_test,
+                                                y_test=y_test,
                                                 weightings_train=weightings_train,
                                                 weightings_test=weightings_test,
                                                 learn_config=train_config.learn_config,

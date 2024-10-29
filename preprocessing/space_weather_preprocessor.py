@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 def unpack_kp_dst_file_to_df(auxiliary_data_path, year_month, use_cache=True):
-
     kp_dst_f107_path = omni_loader.get_output_filename(year=year_month[:4], data_spec="hourly")
     # If cache shall not be used or file does not exist, create it
     if not use_cache or not isfile(kp_dst_f107_path):
@@ -24,14 +23,15 @@ def unpack_kp_dst_file_to_df(auxiliary_data_path, year_month, use_cache=True):
         logger.info(f"Loading data from cache: {kp_dst_f107_path}")
 
     kp_dst_array = np.genfromtxt(kp_dst_f107_path,
-                                   dtype=('U4', 'U3', 'U2', np.int32, np.int32, np.float64),
-                                   names=['year', 'dayofyear', 'hour', "KP", "Dst", "F107"])
+                                 dtype=('U4', 'U3', 'U2', np.int32, np.int32, np.float64),
+                                 names=['year', 'dayofyear', 'hour', "KP", "Dst", "F107"])
     logger.debug(f"kp_dst_array: {kp_dst_array}")
     logger.debug(f"kp_dst_array.shape: {kp_dst_array.shape}")
 
     kp_df = pd.DataFrame(columns=["KP_Timestamp", "gps_sec", "KP", "Dst", "F10.7"])
 
-    timestamps = [datetime.datetime.strptime(kp_dst[0] + ' ' + kp_dst[1] + ' ' + kp_dst[2], '%Y %j %H') for kp_dst in kp_dst_array]
+    timestamps = [datetime.datetime.strptime(kp_dst[0] + ' ' + kp_dst[1] + ' ' + kp_dst[2], '%Y %j %H') for kp_dst in
+                  kp_dst_array]
     gps_times = th.datetime_to_gps(timestamps).astype(np.float64)
     logger.debug(f"len timestamps: {len(timestamps)}")
     logger.debug(f"len gps_times: {len(gps_times)}")
@@ -39,7 +39,6 @@ def unpack_kp_dst_file_to_df(auxiliary_data_path, year_month, use_cache=True):
     # np.genfromtxt returns a structured ndarray, so we can access the columns by name
     kp_df = pd.concat([kp_df, pd.DataFrame({"KP_Timestamp": timestamps, "gps_sec": gps_times, "KP": kp_dst_array['KP'],
                                             "Dst": kp_dst_array['Dst'], "F10.7": kp_dst_array['F107']})], ignore_index=True)
-
 
     # Set Spaceweather_Flag where values are 999.9 or 9999. depending on the type of column because that means the value is
     # missing as per definition on the OMNIWeb website: https://omniweb.gsfc.nasa.gov/html/ow_data.html
@@ -78,7 +77,8 @@ def enrich_df_with_kp_data(data, kp_df, with_kp=False):
     logger.info(f"Spaceweather Flag after Dst: {kp_df['Spaceweather_Flag'].sum()}")
     # TODO: This does not look too well here!?
     data = data.reset_index(drop=True)
-    data = pd.merge_asof(data, kp_df[["KP_Timestamp", "Spaceweather_Flag"]], on=None, left_on="RAW_Timestamp", right_on="KP_Timestamp",
+    data = pd.merge_asof(data, kp_df[["KP_Timestamp", "Spaceweather_Flag"]], on=None, left_on="RAW_Timestamp",
+                         right_on="KP_Timestamp",
                          left_index=False, right_index=False, by=None,
                          left_by=None, right_by=None, suffixes=('_x', '_y'), tolerance=pd.Timedelta("1h"),
                          allow_exact_matches=True,
@@ -86,12 +86,12 @@ def enrich_df_with_kp_data(data, kp_df, with_kp=False):
     data = data.drop(columns=["KP_Timestamp"])
 
     if with_kp:
-        #data = data.set_index("RAW_Timestamp", drop=False)
+        # data = data.set_index("RAW_Timestamp", drop=False)
         data = pd.merge_asof(data, kp_df[["KP_Timestamp", "KP"]], on=None, left_on="RAW_Timestamp", right_on="KP_Timestamp",
-                                  left_index=False, right_index=False, by=None,
-                                  left_by=None, right_by=None, suffixes=('_x', '_y'), tolerance=pd.Timedelta("1h"),
-                                  allow_exact_matches=True,
-                                  direction='backward')
+                             left_index=False, right_index=False, by=None,
+                             left_by=None, right_by=None, suffixes=('_x', '_y'), tolerance=pd.Timedelta("1h"),
+                             allow_exact_matches=True,
+                             direction='backward')
 
     data = data.set_index("RAW_Timestamp", drop=False)
     data["Spaceweather_Flag"] = data["Spaceweather_Flag"].rolling('1min', min_periods=1).max()
