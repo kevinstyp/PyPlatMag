@@ -8,3 +8,6 @@ templates/**/*.cdf
 utils/*.lst
 *.log
 *.lst
+cdf39_0
+/cdf39_0-dist-all.tar.gz
+/cdf39_0-dist/

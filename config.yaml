@@ -1,26 +1,23 @@
 satellite_specifier: GOCE
-
-year_month_specifiers: ['200912']   # ["201002"] # ["201001", "201002", "201003"] # ["200912"]
+year_month_specifiers: ['200912']
 
 log_level: WARN    # 'DEBUG' # one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
 
-goce_data_path: /Volumes/Crucial X8/test_folder/data/raw/
-write_path: /Volumes/Crucial X8/test_folder/data/intermediate/
+goce_data_path: data/raw/
+write_path: data/intermediate/
 
 use_cache: false # True # False
 auxiliary_data_path: data/auxiliary_params/
 
-orbit_counter_path: /Volumes/Crucial X8/test_folder/data/orbit/GO_ORBCNT_20090317T231001_20131109T234516_0101.h5
+orbit_counter_path: data/orbit/GO_ORBCNT_20090317T231001_20131109T234516_0101.h5
 
 model_output_path: neuralnet/
 model_name: pinn
 model_year_months: None
 
-string_config_file: ???
-
 string_conversion: one-hot   # or 'remove'
 
 nan_share: 0.2
 
-CDF_LIB: /Applications/cdf/cdf39_0-dist/lib
-CDF_BIN: /Applications/cdf/cdf39_0-dist/bin
+CDF_LIB: cdf39_0-dist/lib/
+CDF_BIN: cdf39_0-dist/bin/
